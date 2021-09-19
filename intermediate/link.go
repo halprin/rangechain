@@ -115,3 +115,7 @@ func (receiver *Link) AnyMatch(anyMatchFunction func(int) bool) bool {
 		}
 	}
 }
+
+func (receiver *Link) NoneMatch(noneMatchFunction func(int) bool) bool {
+	return !receiver.AnyMatch(noneMatchFunction)
+}

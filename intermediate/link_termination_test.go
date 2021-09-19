@@ -164,3 +164,42 @@ func TestAnyMatchWithEmptySlice(t *testing.T) {
 
 	assert.False(t, match)
 }
+
+func TestNoneMatch(t *testing.T) {
+	inputSlice := []int{985, 3, 27}
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	noneMatchFunction := func(value int) bool {
+		return value % 2 == 0  //even means true
+	}
+	match := link.NoneMatch(noneMatchFunction)
+
+	assert.True(t, match)
+}
+
+func TestNotNoneMatch(t *testing.T) {
+	inputSlice := []int{985, 7, 28}
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	noneMatchFunction := func(value int) bool {
+		return value % 2 == 0  //even means true
+	}
+	match := link.NoneMatch(noneMatchFunction)
+
+	assert.False(t, match)
+}
+
+func TestNoneMatchWithEmptySlice(t *testing.T) {
+	var inputSlice []int
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	noneMatchFunction := func(value int) bool {
+		return value % 2 == 0  //even means true
+	}
+	match := link.NoneMatch(noneMatchFunction)
+
+	assert.True(t, match)
+}
