@@ -12,7 +12,7 @@ func NewLink(generator func() (int, error)) *Link {
 
 //chain methods
 
-func (receiver *Link) filter(filterFunction func(int) bool) *Link {
+func (receiver *Link) Filter(filterFunction func(int) bool) *Link {
 	filterGenerator := func() (int, error) {
 		//go through the generator until you find an item that stays
 		for {
