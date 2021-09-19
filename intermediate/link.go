@@ -1,10 +1,10 @@
 package intermediate
 
 type Link struct {
-	generator func() int
+	generator func() (int, error)
 }
 
-func NewLink(generator func() int) *Link {
+func NewLink(generator func() (int, error)) *Link {
 	return &Link{
 		generator: generator,
 	}
@@ -13,12 +13,16 @@ func NewLink(generator func() int) *Link {
 //chain methods
 
 func (receiver *Link) filter(filterFunction func(int) bool) *Link {
-	filterGenerator := func() int {
+	filterGenerator := func() (int, error) {
 		//go through the generator until you find an item that stays
 		for {
-			valueToFilter := receiver.generator()
+			valueToFilter, err := receiver.generator()
+			if err != nil {
+				return 0, err
+			}
+
 			if filterFunction(valueToFilter) {
-				return valueToFilter
+				return valueToFilter, nil
 			}
 		}
 	}
@@ -28,20 +32,15 @@ func (receiver *Link) filter(filterFunction func(int) bool) *Link {
 
 //termination methods
 
-func (receiver *Link) slice() (endSlice []int) {
-	//var endSlice []int
-
-	defer func() {
-		recover()
-		//if p != nil {
-		//	return endSlice
-		//}
-	}()
+func (receiver *Link) slice() []int {
+	var endSlice []int
 
 	for {
-		currentValue := receiver.generator()
+		currentValue, err := receiver.generator()
+		if err != nil {
+			return endSlice
+		}
+
 		endSlice = append(endSlice, currentValue)
 	}
-
-	return endSlice
 }

@@ -5,16 +5,18 @@ import (
 	"testing"
 )
 
-func TestFromSliceWithLastTimePanic(t *testing.T) {
+func TestFromSliceWithLastTimeError(t *testing.T) {
+	assert := assert.New(t)
+
 	generator := FromSlice([]int{9})
 
-	assert.NotPanics(t, func() {
-		generator()
-	})
+	_, err := generator()
 
-	assert.Panics(t, func() {
-		generator()
-	})
+	assert.NoError(err)
+
+	_, err = generator()
+
+	assert.ErrorIs(err, Exhausted)
 }
 
 func TestFromSliceWithCorrectOrder(t *testing.T) {
@@ -26,20 +28,23 @@ func TestFromSliceWithCorrectOrder(t *testing.T) {
 	theSlice := []int{expectedFirstItem, expectedSecondItem, expectedThirdItem}
 	generator := FromSlice(theSlice)
 
-	actualFirstItem := generator()
+	actualFirstItem, err := generator()
 	assert.Equal(expectedFirstItem, actualFirstItem)
+	assert.NoError(err)
 
-	actualSecondItem := generator()
+	actualSecondItem, err := generator()
 	assert.Equal(expectedSecondItem, actualSecondItem)
+	assert.NoError(err)
 
-	actualThirdItem := generator()
+	actualThirdItem, err := generator()
 	assert.Equal(actualThirdItem, actualThirdItem)
+	assert.NoError(err)
 }
 
 func TestFromSliceEmpty(t *testing.T) {
-	iterator := FromSlice([]int{})
+	generator := FromSlice([]int{})
 
-	assert.Panics(t, func() {
-		iterator()
-	})
+	_, err := generator()
+
+	assert.ErrorIs(t, err, Exhausted)
 }
