@@ -89,3 +89,16 @@ func (receiver *Link) Last() *int {
 		last = &currentValue
 	}
 }
+
+func (receiver *Link) AllMatch(allMatchFunction func(int) bool) bool {
+	for {
+		currentValue, err := receiver.generator()
+		if err != nil {
+			return true
+		}
+
+		if !allMatchFunction(currentValue) {
+			return false
+		}
+	}
+}

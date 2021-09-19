@@ -86,3 +86,42 @@ func TestLastWithEmptySlice(t *testing.T) {
 
 	assert.Nil(t, actualLast)
 }
+
+func TestAllMatch(t *testing.T) {
+	inputSlice := []int{984, 8, 26}
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	allMatchFunction := func(value int) bool {
+		return value % 2 == 0  //even means true
+	}
+	match := link.AllMatch(allMatchFunction)
+
+	assert.True(t, match)
+}
+
+func TestNotAllMatch(t *testing.T) {
+	inputSlice := []int{984, 7, 26}
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	allMatchFunction := func(value int) bool {
+		return value % 2 == 0  //even means true
+	}
+	match := link.AllMatch(allMatchFunction)
+
+	assert.False(t, match)
+}
+
+func TestAllMatchWithEmptySlice(t *testing.T) {
+	var inputSlice []int
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	allMatchFunction := func(value int) bool {
+		return value % 2 == 0  //even means true
+	}
+	match := link.AllMatch(allMatchFunction)
+
+	assert.True(t, match)
+}
