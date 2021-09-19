@@ -44,3 +44,15 @@ func (receiver *Link) Slice() []int {
 		endSlice = append(endSlice, currentValue)
 	}
 }
+
+
+func (receiver *Link) ForEach(forEachFunction func(int)) {
+	for {
+		currentValue, err := receiver.generator()
+		if err != nil {
+			return
+		}
+
+		forEachFunction(currentValue)
+	}
+}

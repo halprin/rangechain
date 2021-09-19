@@ -16,3 +16,17 @@ func TestSlice(t *testing.T) {
 
 	assert.Equal(t, expectedSlice, actualSlice)
 }
+
+func TestForEach(t *testing.T) {
+	inputSlice := []int{987, 8, 26}
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	var seenItems []int
+	forEachFunction := func(value int) {
+		seenItems = append(seenItems, value)
+	}
+	link.ForEach(forEachFunction)
+
+	assert.ElementsMatch(t, inputSlice, seenItems)
+}
