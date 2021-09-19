@@ -30,3 +30,13 @@ func TestForEach(t *testing.T) {
 
 	assert.ElementsMatch(t, inputSlice, seenItems)
 }
+
+func TestCount(t *testing.T) {
+	inputSlice := []int{987, 8, 26}
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	count := link.Count()
+
+	assert.Equal(t, len(inputSlice), count)
+}

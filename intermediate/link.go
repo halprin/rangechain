@@ -55,3 +55,15 @@ func (receiver *Link) ForEach(forEachFunction func(int)) {
 		forEachFunction(currentValue)
 	}
 }
+
+func (receiver *Link) Count() int {
+	count := 0
+	for {
+		_, err := receiver.generator()
+		if err != nil {
+			return count
+		}
+
+		count++
+	}
+}
