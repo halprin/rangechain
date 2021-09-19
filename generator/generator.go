@@ -1,4 +1,4 @@
-package iterator
+package generator
 
 func FromSlice(theSlice []int) func() int {
 	currentIndex := 0

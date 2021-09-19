@@ -1,4 +1,4 @@
-package iterator
+package generator
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -6,32 +6,33 @@ import (
 )
 
 func TestFromSliceWithLastTimePanic(t *testing.T) {
-	iterator := FromSlice([]int{9})
+	generator := FromSlice([]int{9})
 
 	assert.NotPanics(t, func() {
-		iterator()
+		generator()
 	})
 
 	assert.Panics(t, func() {
-		iterator()
+		generator()
 	})
 }
 
 func TestFromSliceWithCorrectOrder(t *testing.T) {
 	assert := assert.New(t)
+
 	expectedFirstItem := 1
 	expectedSecondItem := 26
 	expectedThirdItem := 9
 	theSlice := []int{expectedFirstItem, expectedSecondItem, expectedThirdItem}
-	iterator := FromSlice(theSlice)
+	generator := FromSlice(theSlice)
 
-	actualFirstItem := iterator()
+	actualFirstItem := generator()
 	assert.Equal(expectedFirstItem, actualFirstItem)
 
-	actualSecondItem := iterator()
+	actualSecondItem := generator()
 	assert.Equal(expectedSecondItem, actualSecondItem)
 
-	actualThirdItem := iterator()
+	actualThirdItem := generator()
 	assert.Equal(actualThirdItem, actualThirdItem)
 }
 
