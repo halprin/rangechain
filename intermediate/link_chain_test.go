@@ -20,3 +20,14 @@ func TestFilter(t *testing.T) {
 
 	assert.Equal(t, expectedSlice, actualSlice)
 }
+
+func TestSkip(t *testing.T) {
+	inputSlice    := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	howManyToSkip := 3
+	actualSlice := link.Skip(howManyToSkip).Slice()
+
+	assert.Equal(t, inputSlice[howManyToSkip:], actualSlice)
+}

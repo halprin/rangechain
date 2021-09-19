@@ -30,6 +30,14 @@ func (receiver *Link) Filter(filterFunction func(int) bool) *Link {
 	return NewLink(filterGenerator)
 }
 
+func (receiver *Link) Skip(skipNumber int) *Link {
+	for count := 0; count < skipNumber; count++ {
+		_, _ = receiver.generator()
+	}
+
+	return NewLink(receiver.generator)
+}
+
 //termination methods
 
 func (receiver *Link) Slice() []int {
