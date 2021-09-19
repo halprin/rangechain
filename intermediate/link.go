@@ -102,3 +102,16 @@ func (receiver *Link) AllMatch(allMatchFunction func(int) bool) bool {
 		}
 	}
 }
+
+func (receiver *Link) AnyMatch(anyMatchFunction func(int) bool) bool {
+	for {
+		currentValue, err := receiver.generator()
+		if err != nil {
+			return false
+		}
+
+		if anyMatchFunction(currentValue) {
+			return true
+		}
+	}
+}
