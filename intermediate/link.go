@@ -1,5 +1,7 @@
 package intermediate
 
+import "github.com/halprin/slice-chain/generator"
+
 type Link struct {
 	generator func() (int, error)
 }
@@ -38,10 +40,31 @@ func (receiver *Link) Skip(skipNumber int) *Link {
 	return NewLink(receiver.generator)
 }
 
+func (receiver *Link) Limit(keepSize int) *Link {
+	itemsSeen := 0
+
+	limitGenerator := func() (int, error) {
+		if itemsSeen >= keepSize {
+			return 0, generator.Exhausted
+		}
+
+		currentValue, err := receiver.generator()
+		if err != nil {
+			return 0, err
+		}
+
+		itemsSeen++
+
+		return currentValue, err
+	}
+
+	return NewLink(limitGenerator)
+}
+
 //termination methods
 
 func (receiver *Link) Slice() []int {
-	var endSlice []int
+	endSlice := []int{}
 
 	for {
 		currentValue, err := receiver.generator()
