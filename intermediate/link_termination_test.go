@@ -131,10 +131,10 @@ func TestAnyMatch(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	allMatchFunction := func(value int) bool {
+	anyMatchFunction := func(value int) bool {
 		return value % 2 == 0  //even means true
 	}
-	match := link.AnyMatch(allMatchFunction)
+	match := link.AnyMatch(anyMatchFunction)
 
 	assert.True(t, match)
 }
@@ -144,10 +144,10 @@ func TestNotAnyMatch(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	allMatchFunction := func(value int) bool {
+	anyMatchFunction := func(value int) bool {
 		return value % 2 == 0  //even means true
 	}
-	match := link.AnyMatch(allMatchFunction)
+	match := link.AnyMatch(anyMatchFunction)
 
 	assert.False(t, match)
 }
@@ -157,10 +157,10 @@ func TestAnyMatchWithEmptySlice(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	allMatchFunction := func(value int) bool {
+	anyMatchFunction := func(value int) bool {
 		return value % 2 == 0  //even means true
 	}
-	match := link.AnyMatch(allMatchFunction)
+	match := link.AnyMatch(anyMatchFunction)
 
 	assert.False(t, match)
 }
