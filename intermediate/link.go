@@ -28,8 +28,15 @@ func (receiver *Link) filter(filterFunction func(int) bool) *Link {
 
 //termination methods
 
-func (receiver *Link) slice() []int {
-	var endSlice []int
+func (receiver *Link) slice() (endSlice []int) {
+	//var endSlice []int
+
+	defer func() {
+		recover()
+		//if p != nil {
+		//	return endSlice
+		//}
+	}()
 
 	for {
 		currentValue := receiver.generator()
