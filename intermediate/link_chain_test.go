@@ -16,7 +16,7 @@ func TestFilter(t *testing.T) {
 		return value > 5
 	}
 
-	actualSlice := link.filter(filterFunction).slice()
+	actualSlice := link.filter(filterFunction).Slice()
 
 	assert.Equal(t, expectedSlice, actualSlice)
 }

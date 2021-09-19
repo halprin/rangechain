@@ -12,7 +12,7 @@ func TestSlice(t *testing.T) {
 	generation := generator.FromSlice(expectedSlice)
 	link := NewLink(generation)
 
-	actualSlice := link.slice()
+	actualSlice := link.Slice()
 
 	assert.Equal(t, expectedSlice, actualSlice)
 }

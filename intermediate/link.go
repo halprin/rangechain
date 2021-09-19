@@ -32,7 +32,7 @@ func (receiver *Link) filter(filterFunction func(int) bool) *Link {
 
 //termination methods
 
-func (receiver *Link) slice() []int {
+func (receiver *Link) Slice() []int {
 	var endSlice []int
 
 	for {
