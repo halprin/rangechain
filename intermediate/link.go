@@ -45,7 +45,6 @@ func (receiver *Link) Slice() []int {
 	}
 }
 
-
 func (receiver *Link) ForEach(forEachFunction func(int)) {
 	for {
 		currentValue, err := receiver.generator()
