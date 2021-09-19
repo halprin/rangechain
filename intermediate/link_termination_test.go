@@ -63,3 +63,26 @@ func TestFirstWithEmptySlice(t *testing.T) {
 
 	assert.Nil(t, actualFirst)
 }
+
+func TestLast(t *testing.T) {
+	assert := assert.New(t)
+
+	inputSlice := []int{987, 8, 26}
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	actualLast := link.Last()
+
+	assert.NotNil(actualLast)
+	assert.Equal(inputSlice[len(inputSlice) - 1], *actualLast)
+}
+
+func TestLastWithEmptySlice(t *testing.T) {
+	var inputSlice []int
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	actualLast := link.Last()
+
+	assert.Nil(t, actualLast)
+}

@@ -76,3 +76,16 @@ func (receiver *Link) First() *int {
 
 	return &value
 }
+
+func (receiver *Link) Last() *int {
+	var last *int
+
+	for {
+		currentValue, err := receiver.generator()
+		if err != nil {
+			return last
+		}
+
+		last = &currentValue
+	}
+}
