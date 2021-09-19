@@ -36,7 +36,30 @@ func TestCount(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	count := link.Count()
+	actualCount := link.Count()
 
-	assert.Equal(t, len(inputSlice), count)
+	assert.Equal(t, len(inputSlice), actualCount)
+}
+
+func TestFirst(t *testing.T) {
+	assert := assert.New(t)
+
+	inputSlice := []int{987, 8, 26}
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	actualFirst := link.First()
+
+	assert.NotNil(actualFirst)
+	assert.Equal(inputSlice[0], *actualFirst)
+}
+
+func TestFirstWithEmptySlice(t *testing.T) {
+	var inputSlice []int
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	actualFirst := link.First()
+
+	assert.Nil(t, actualFirst)
 }

@@ -67,3 +67,12 @@ func (receiver *Link) Count() int {
 		count++
 	}
 }
+
+func (receiver *Link) First() *int {
+	value, err := receiver.generator()
+	if err != nil {
+		return nil
+	}
+
+	return &value
+}
