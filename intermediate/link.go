@@ -3,10 +3,10 @@ package intermediate
 import "github.com/halprin/slice-chain/generator"
 
 type Link struct {
-	generator func() (int, error)
+	generator func() (interface{}, error)
 }
 
-func NewLink(generator func() (int, error)) *Link {
+func NewLink(generator func() (interface{}, error)) *Link {
 	return &Link{
 		generator: generator,
 	}
@@ -14,8 +14,8 @@ func NewLink(generator func() (int, error)) *Link {
 
 //chain methods
 
-func (receiver *Link) Filter(filterFunction func(int) bool) *Link {
-	filterGenerator := func() (int, error) {
+func (receiver *Link) Filter(filterFunction func(interface{}) bool) *Link {
+	filterGenerator := func() (interface{}, error) {
 		//go through the generator until you find an item that stays
 		for {
 			valueToFilter, err := receiver.generator()
@@ -43,7 +43,7 @@ func (receiver *Link) Skip(skipNumber int) *Link {
 func (receiver *Link) Limit(keepSize int) *Link {
 	itemsSeen := 0
 
-	limitGenerator := func() (int, error) {
+	limitGenerator := func() (interface{}, error) {
 		if itemsSeen >= keepSize {
 			return 0, generator.Exhausted
 		}
@@ -63,8 +63,8 @@ func (receiver *Link) Limit(keepSize int) *Link {
 
 //termination methods
 
-func (receiver *Link) Slice() []int {
-	endSlice := []int{}
+func (receiver *Link) Slice() []interface{} {
+	endSlice := []interface{}{}
 
 	for {
 		currentValue, err := receiver.generator()
@@ -76,7 +76,7 @@ func (receiver *Link) Slice() []int {
 	}
 }
 
-func (receiver *Link) ForEach(forEachFunction func(int)) {
+func (receiver *Link) ForEach(forEachFunction func(interface{})) {
 	for {
 		currentValue, err := receiver.generator()
 		if err != nil {
@@ -99,7 +99,7 @@ func (receiver *Link) Count() int {
 	}
 }
 
-func (receiver *Link) First() *int {
+func (receiver *Link) First() *interface{} {
 	value, err := receiver.generator()
 	if err != nil {
 		return nil
@@ -108,8 +108,8 @@ func (receiver *Link) First() *int {
 	return &value
 }
 
-func (receiver *Link) Last() *int {
-	var last *int
+func (receiver *Link) Last() *interface{} {
+	var last *interface{}
 
 	for {
 		currentValue, err := receiver.generator()
@@ -121,7 +121,7 @@ func (receiver *Link) Last() *int {
 	}
 }
 
-func (receiver *Link) AllMatch(allMatchFunction func(int) bool) bool {
+func (receiver *Link) AllMatch(allMatchFunction func(interface{}) bool) bool {
 	for {
 		currentValue, err := receiver.generator()
 		if err != nil {
@@ -134,7 +134,7 @@ func (receiver *Link) AllMatch(allMatchFunction func(int) bool) bool {
 	}
 }
 
-func (receiver *Link) AnyMatch(anyMatchFunction func(int) bool) bool {
+func (receiver *Link) AnyMatch(anyMatchFunction func(interface{}) bool) bool {
 	for {
 		currentValue, err := receiver.generator()
 		if err != nil {
@@ -147,6 +147,6 @@ func (receiver *Link) AnyMatch(anyMatchFunction func(int) bool) bool {
 	}
 }
 
-func (receiver *Link) NoneMatch(noneMatchFunction func(int) bool) bool {
+func (receiver *Link) NoneMatch(noneMatchFunction func(interface{}) bool) bool {
 	return !receiver.AnyMatch(noneMatchFunction)
 }
