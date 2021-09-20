@@ -1,22 +1,13 @@
 package slice_chain
 
 import (
-	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestFunStuff(t *testing.T) {
-	stringSlice := []string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
-	chain := FromSlice(stringSlice)
+func TestFromSlice(t *testing.T) {
+	inputSlice := []string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
+	chain := FromSlice(inputSlice)
 
-	outputSlice := chain.Filter(func(value interface{}) bool {
-		stringValue, ok := value.(string)
-		if !ok {
-			return false
-		}
-
-		return len(stringValue) % 2 == 0
-	}).Skip(1).Slice()
-
-	fmt.Println(outputSlice)
+	assert.ElementsMatch(t, chain.Slice(), inputSlice)
 }
