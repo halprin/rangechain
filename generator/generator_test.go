@@ -8,7 +8,7 @@ import (
 func TestFromSliceWithLastTimeError(t *testing.T) {
 	assert := assert.New(t)
 
-	generator := FromSlice([]int{9})
+	generator := FromSlice([]interface{}{9})
 
 	_, err := generator()
 
@@ -25,7 +25,7 @@ func TestFromSliceWithCorrectOrder(t *testing.T) {
 	expectedFirstItem := 1
 	expectedSecondItem := 26
 	expectedThirdItem := 9
-	theSlice := []int{expectedFirstItem, expectedSecondItem, expectedThirdItem}
+	theSlice := []interface{}{expectedFirstItem, expectedSecondItem, expectedThirdItem}
 	generator := FromSlice(theSlice)
 
 	actualFirstItem, err := generator()
@@ -42,7 +42,7 @@ func TestFromSliceWithCorrectOrder(t *testing.T) {
 }
 
 func TestFromSliceEmpty(t *testing.T) {
-	generator := FromSlice([]int{})
+	generator := FromSlice([]interface{}{})
 
 	_, err := generator()
 

@@ -4,15 +4,15 @@ import "errors"
 
 var Exhausted = errors.New("generator exhausted")
 
-func FromSlice(theSlice []int) func() (int, error) {
+func FromSlice(slice []interface{}) func() (interface{}, error) {
 	currentIndex := 0
 
-	return func() (int, error) {
-		if currentIndex >= len(theSlice) {
+	return func() (interface{}, error) {
+		if currentIndex >= len(slice) {
 			return 0, Exhausted
 		}
 
-		value := theSlice[currentIndex]
+		value := slice[currentIndex]
 		currentIndex++
 
 		return value, nil
