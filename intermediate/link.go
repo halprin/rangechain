@@ -14,6 +14,19 @@ func NewLink(generator func() (interface{}, error)) *Link {
 
 //chain methods
 
+func (receiver *Link) Map(mapFunction func(interface{}) interface{}) *Link {
+	mapGenerator := func() (interface{}, error) {
+		valueToMap, err := receiver.generator()
+		if err != nil {
+			return 0, err
+		}
+
+		return mapFunction(valueToMap), nil
+	}
+
+	return NewLink(mapGenerator)
+}
+
 func (receiver *Link) Filter(filterFunction func(interface{}) bool) *Link {
 	filterGenerator := func() (interface{}, error) {
 		//go through the generator until you find an item that stays
