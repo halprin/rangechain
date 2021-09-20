@@ -84,3 +84,14 @@ func TestLimitLargerThanSlice(t *testing.T) {
 
 	assert.Equal(t, helper.InterfaceSlice(inputSlice), actualSlice)
 }
+
+func TestDistinct(t *testing.T) {
+	inputSlice := []int{7, 4, 2, 7, 3, 7, 9, 5, 5, 2, 6, 0, 8, 1}
+	expectedSlice := helper.InterfaceSlice([]int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1})
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	actualSlice := link.Distinct().Slice()
+
+	assert.Equal(t, expectedSlice, actualSlice)
+}

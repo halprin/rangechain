@@ -1,6 +1,9 @@
 package intermediate
 
-import "github.com/halprin/slice-chain/generator"
+import (
+	"github.com/halprin/slice-chain/generator"
+	"github.com/halprin/slice-chain/helper"
+)
 
 type Link struct {
 	generator func() (interface{}, error)
@@ -72,6 +75,27 @@ func (receiver *Link) Limit(keepSize int) *Link {
 	}
 
 	return NewLink(limitGenerator)
+}
+
+func (receiver *Link) Distinct() *Link {
+	seenTracker := helper.NewSet()
+
+	distinctGenerator := func() (interface{}, error) {
+		//go through the generator until you find an item that hasn't been seen yet
+		for {
+			valueToDistinct, err := receiver.generator()
+			if err != nil {
+				return 0, err
+			}
+
+			if !seenTracker.Contains(valueToDistinct) {
+				seenTracker.Add(valueToDistinct)
+				return valueToDistinct, nil
+			}
+		}
+	}
+
+	return NewLink(distinctGenerator)
 }
 
 //termination methods
