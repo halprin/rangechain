@@ -3,10 +3,11 @@ package helper
 import "reflect"
 
 func InterfaceSlice(slice interface{}) []interface{} {
-	concreteValue := reflect.ValueOf(slice)
-	if concreteValue.Kind() != reflect.Slice {
+	if !IsSlice(slice) {
 		panic("non-slice type provided")
 	}
+
+	concreteValue := reflect.ValueOf(slice)
 
 	if concreteValue.IsNil() {
 		return nil

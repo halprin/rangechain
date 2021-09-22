@@ -1,6 +1,8 @@
 package generator
 
-import "errors"
+import (
+	"errors"
+)
 
 var Exhausted = errors.New("generator exhausted")
 

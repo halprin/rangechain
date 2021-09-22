@@ -98,6 +98,45 @@ func (receiver *Link) Distinct() *Link {
 	return NewLink(distinctGenerator)
 }
 
+func (receiver *Link) Flatten() *Link {
+	var currentGenerator func() (interface{}, error)
+
+	flattenGenerator := func() (interface{}, error) {
+		var innerValue interface{}
+		var err error
+
+		for innerValue == nil {
+			if currentGenerator == nil {
+				var currentValue interface{}
+				currentValue, err = receiver.generator()
+				if err != nil {
+					return 0, err
+				}
+
+				if helper.IsSlice(currentValue) {
+					sliceCurrentValue := helper.InterfaceSlice(currentValue)
+					currentGenerator = generator.FromSlice(sliceCurrentValue)
+				} else {
+					//it's some basic value, just return that
+					innerValue = currentValue
+					break
+				}
+			}
+
+			innerValue, err = currentGenerator()
+			if err != nil {
+				//the current generator is exhausted, set it to nil so we grab the next generator
+				innerValue = nil
+				currentGenerator = nil
+			}
+		}
+
+		return innerValue, err
+	}
+
+	return NewLink(flattenGenerator)
+}
+
 //termination methods
 
 func (receiver *Link) Slice() []interface{} {

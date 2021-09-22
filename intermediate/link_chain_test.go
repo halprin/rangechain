@@ -95,3 +95,43 @@ func TestDistinct(t *testing.T) {
 
 	assert.Equal(t, expectedSlice, actualSlice)
 }
+
+func TestFlattenWithSliceOfSlice(t *testing.T) {
+	inputSlice := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
+	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 5, 6, 7, 8, 9})
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	actualSlice := link.Flatten().Slice()
+
+	assert.Equal(t, expectedSlice, actualSlice)
+}
+
+func TestFlattenWithSliceMix(t *testing.T) {
+	inputSlice := []interface{}{[]int{1, 2, 3}, 4, []int{7, 8, 9}}
+	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 7, 8, 9})
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	actualSlice := link.Flatten().Slice()
+
+	assert.Equal(t, expectedSlice, actualSlice)
+}
+
+func TestFlattenWithSliceAndMap(t *testing.T) {
+	innerMap := map[int]int{
+		4: 5,
+		6: 7,
+	}
+	inputSlice := []interface{}{[]int{1, 2, 3}, innerMap, []int{7, 8, 9}}
+	//notice that the expected just puts the map right back into the slice without expanding it
+	//in the future we'll support expanding other containers
+	expectedSlice := []interface{}{1, 2, 3, innerMap, 7, 8, 9}
+
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	actualSlice := link.Flatten().Slice()
+
+	assert.Equal(t, expectedSlice, actualSlice)
+}
