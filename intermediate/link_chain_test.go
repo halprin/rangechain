@@ -153,3 +153,14 @@ func TestSort(t *testing.T) {
 
 	assert.Equal(t, expectedSlice, actualSlice)
 }
+
+func TestReverse(t *testing.T) {
+	inputSlice    := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
+	expectedSlice := helper.InterfaceSlice([]int{1, 8, 0, 6, 5, 9, 3, 2, 4, 7})
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	actualSlice := link.Reverse().Slice()
+
+	assert.Equal(t, expectedSlice, actualSlice)
+}
