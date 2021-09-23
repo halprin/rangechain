@@ -3,6 +3,7 @@ package intermediate
 import (
 	"github.com/halprin/slice-chain/generator"
 	"github.com/halprin/slice-chain/helper"
+	"sort"
 )
 
 type Link struct {
@@ -135,6 +136,18 @@ func (receiver *Link) Flatten() *Link {
 	}
 
 	return NewLink(flattenGenerator)
+}
+
+func (receiver *Link) Sort(returnLessFunction func([]interface{}) func(int, int) bool) *Link {
+	serializedSlice := receiver.Slice()
+
+	lessFunction := returnLessFunction(serializedSlice)
+	sort.Slice(serializedSlice, lessFunction)
+
+
+	generation := generator.FromSlice(serializedSlice)
+
+	return NewLink(generation)
 }
 
 //termination methods

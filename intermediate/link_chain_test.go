@@ -135,3 +135,21 @@ func TestFlattenWithSliceAndMap(t *testing.T) {
 
 	assert.Equal(t, expectedSlice, actualSlice)
 }
+
+func TestSort(t *testing.T) {
+	inputSlice    := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
+	expectedSlice := helper.InterfaceSlice([]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	returnLessFunction := func(sliceToSort []interface{}) func(int, int) bool {
+		return func(i int, j int) bool {
+			iItem := sliceToSort[i].(int)
+			jItem := sliceToSort[j].(int)
+			return iItem < jItem
+		}
+	}
+	actualSlice := link.Sort(returnLessFunction).Slice()
+
+	assert.Equal(t, expectedSlice, actualSlice)
+}
