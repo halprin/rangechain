@@ -254,8 +254,6 @@ func TestReduceWithOneItem(t *testing.T) {
 }
 
 func TestReduceWithZeroItems(t *testing.T) {
-	assert := assert.New(t)
-
 	inputSlice := []int{}
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
@@ -268,5 +266,57 @@ func TestReduceWithZeroItems(t *testing.T) {
 	}
 	actualReducedValue := link.Reduce(reduceFunction)
 
-	assert.Nil(actualReducedValue)
+	assert.Nil(t, actualReducedValue)
+}
+
+func TestReduceWithInitialValue(t *testing.T) {
+	inputSlice := []int{987, 8, 26}
+	inputInitialValue := 4
+	expectedValue := inputInitialValue * inputSlice[0] * inputSlice[1] * inputSlice[2]
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
+		firstIntItem := firstItem.(int)
+		secondIntItem := secondItem.(int)
+
+		return firstIntItem * secondIntItem
+	}
+	actualReducedValue := link.ReduceWithInitialValue(reduceFunction, inputInitialValue)
+
+	assert.Equal(t, expectedValue, actualReducedValue)
+}
+
+func TestReduceWithInitialValueWithOneItem(t *testing.T) {
+	inputSlice := []int{987}
+	inputInitialValue := 4
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
+		firstIntItem := firstItem.(int)
+		secondIntItem := secondItem.(int)
+
+		return firstIntItem * secondIntItem
+	}
+	actualReducedValue := link.ReduceWithInitialValue(reduceFunction, inputInitialValue)
+
+	assert.Equal(t, inputInitialValue * inputSlice[0], actualReducedValue)
+}
+
+func TestReduceWithInitialValueWithZeroItems(t *testing.T) {
+	inputSlice := []int{}
+	inputInitialValue := 4
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
+		firstIntItem := firstItem.(int)
+		secondIntItem := secondItem.(int)
+
+		return firstIntItem * secondIntItem
+	}
+	actualReducedValue := link.ReduceWithInitialValue(reduceFunction, inputInitialValue)
+
+	assert.Equal(t, inputInitialValue, actualReducedValue)
 }

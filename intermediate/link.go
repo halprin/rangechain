@@ -270,3 +270,19 @@ func (receiver *Link) Reduce(reduceFunction func(interface{}, interface{}) inter
 
 	return &intermediateItem
 }
+
+func (receiver *Link) ReduceWithInitialValue(reduceFunction func(interface{}, interface{}) interface{}, initialValue interface{}) interface{} {
+	nextItem, err := receiver.generator()
+	if err != nil {
+		return initialValue
+	}
+
+	intermediateItem := initialValue
+
+	for err == nil {
+		intermediateItem = reduceFunction(intermediateItem, nextItem)
+		nextItem, err = receiver.generator()
+	}
+
+	return intermediateItem
+}
