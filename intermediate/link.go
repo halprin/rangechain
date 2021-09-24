@@ -251,3 +251,22 @@ func (receiver *Link) AnyMatch(anyMatchFunction func(interface{}) bool) bool {
 func (receiver *Link) NoneMatch(noneMatchFunction func(interface{}) bool) bool {
 	return !receiver.AnyMatch(noneMatchFunction)
 }
+
+func (receiver *Link) Reduce(reduceFunction func(interface{}, interface{}) interface{}) *interface{} {
+	nextItem, err := receiver.generator()
+	if err != nil {
+		return nil
+	}
+
+	intermediateItem, err := receiver.generator()
+	if err != nil {
+		return &nextItem
+	}
+
+	for err == nil {
+		intermediateItem = reduceFunction(intermediateItem, nextItem)
+		nextItem, err = receiver.generator()
+	}
+
+	return &intermediateItem
+}

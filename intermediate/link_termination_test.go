@@ -213,3 +213,60 @@ func TestNoneMatchWithEmptySlice(t *testing.T) {
 
 	assert.True(t, match)
 }
+
+func TestReduce(t *testing.T) {
+	assert := assert.New(t)
+
+	inputSlice := []int{987, 8, 26}
+	expectedValue := inputSlice[0] * inputSlice[1] * inputSlice[2]
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
+		firstIntItem := firstItem.(int)
+		secondIntItem := secondItem.(int)
+
+		return firstIntItem * secondIntItem
+	}
+	actualReducedValue := link.Reduce(reduceFunction)
+
+	assert.NotNil(actualReducedValue)
+	assert.Equal(expectedValue, *actualReducedValue)
+}
+
+func TestReduceWithOneItem(t *testing.T) {
+	assert := assert.New(t)
+
+	inputSlice := []int{987}
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
+		firstIntItem := firstItem.(int)
+		secondIntItem := secondItem.(int)
+
+		return firstIntItem * secondIntItem
+	}
+	actualReducedValue := link.Reduce(reduceFunction)
+
+	assert.NotNil(actualReducedValue)
+	assert.Equal(inputSlice[0], *actualReducedValue)
+}
+
+func TestReduceWithZeroItems(t *testing.T) {
+	assert := assert.New(t)
+
+	inputSlice := []int{}
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
+		firstIntItem := firstItem.(int)
+		secondIntItem := secondItem.(int)
+
+		return firstIntItem * secondIntItem
+	}
+	actualReducedValue := link.Reduce(reduceFunction)
+
+	assert.Nil(actualReducedValue)
+}
