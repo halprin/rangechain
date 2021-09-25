@@ -115,8 +115,7 @@ func (receiver *Link) Flatten() *Link {
 				}
 
 				if helper.IsSlice(currentValue) {
-					sliceCurrentValue := helper.InterfaceSlice(currentValue)
-					currentGenerator = generator.FromSlice(sliceCurrentValue)
+					currentGenerator = generator.FromSlice(currentValue)
 				} else {
 					//it's some basic value, just return that
 					innerValue = currentValue
