@@ -26,3 +26,19 @@ func TestMapParallel(t *testing.T) {
 
 	assert.Equal(t, expectedOutput, actualSlice)
 }
+
+func TestFilterParallel(t *testing.T) {
+	inputSlice := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
+	expectedSlice := helper.InterfaceSlice([]int{7, 9, 6, 8})
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	filterFunction := func(value interface{}) bool {
+		intValue := value.(int)
+		return intValue > 5
+	}
+
+	actualSlice := link.FilterParallel(filterFunction).Slice()
+
+	assert.Equal(t, expectedSlice, actualSlice)
+}
