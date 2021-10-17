@@ -2,6 +2,7 @@ package slice_chain
 
 import (
 	"testing"
+	"time"
 )
 
 var size10Slice = makeIntSliceOfSize(10)
@@ -41,6 +42,24 @@ func BenchmarkFlatten1000(b *testing.B) {
 		}).Map(func(value interface{}) interface{} {
 			intValue := value.(int)
 			return intValue * 2 + 2
+		}).Slice()
+	}
+}
+
+func BenchmarkSleepWithSerialMap(b *testing.B) {
+	for runIndex := 0; runIndex < b.N; runIndex++ {
+		FromSlice(size10Slice).Map(func(value interface{}) interface{} {
+			time.Sleep(100 * time.Millisecond)
+			return value
+		}).Slice()
+	}
+}
+
+func BenchmarkSleepWithParallelMap(b *testing.B) {
+	for runIndex := 0; runIndex < b.N; runIndex++ {
+		FromSlice(size10Slice).MapParallel(func(value interface{}) interface{} {
+			time.Sleep(100 * time.Millisecond)
+			return value
 		}).Slice()
 	}
 }
