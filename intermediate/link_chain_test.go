@@ -129,6 +129,20 @@ func TestFlattenWithArray(t *testing.T) {
 	assert.Equal(t, expectedSlice, actualSlice)
 }
 
+func TestFlattenWithChannel(t *testing.T) {
+	firstChannel := createTestChannel([]int{1, 2, 3})
+	secondChannel := createTestChannel([]int{7, 8, 9})
+
+	inputSlice := []interface{}{firstChannel, 4, secondChannel}
+	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 7, 8, 9})
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	actualSlice := link.Flatten().Slice()
+
+	assert.Equal(t, expectedSlice, actualSlice)
+}
+
 func TestFlattenWithSliceAndMap(t *testing.T) {
 	innerMap := map[int]int{
 		4: 5,
@@ -174,4 +188,17 @@ func TestReverse(t *testing.T) {
 	actualSlice := link.Reverse().Slice()
 
 	assert.Equal(t, expectedSlice, actualSlice)
+}
+
+func createTestChannel(intSlice []int) chan interface{} {
+	intChannel := make(chan interface{})
+
+	go func() {
+		for _, currentInt := range intSlice {
+			intChannel <- currentInt
+		}
+		close(intChannel)
+	}()
+
+	return intChannel
 }

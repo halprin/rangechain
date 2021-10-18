@@ -73,6 +73,12 @@ func TestChannelNotPanicsGivenChannel(t *testing.T) {
 	})
 }
 
+func TestChannelDoesntWorkGivenSlice(t *testing.T) {
+	assert.Panics(t, func() {
+		FromChannel([]interface{}{})
+	})
+}
+
 func TestChannelEndsWithError(t *testing.T) {
 	assert := assert.New(t)
 

@@ -24,13 +24,15 @@ func FromArray(array interface{}) func() (interface{}, error) {
 	return generatorFromSliceOrArray(array)
 }
 
-func FromChannel(channel chan interface{}) func() (interface{}, error) {
+func FromChannel(channel interface{}) func() (interface{}, error) {
 	if !helper.IsChannel(channel) {
 		panic("non-channel type provided")
 	}
 
+	actualChannel := channel.(chan interface{})
+
 	return func() (interface{}, error) {
-		for value := range channel {
+		for value := range actualChannel {
 			return value, nil
 		}
 
