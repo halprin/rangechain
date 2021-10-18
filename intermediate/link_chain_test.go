@@ -119,7 +119,7 @@ func TestFlattenWithSliceMix(t *testing.T) {
 }
 
 func TestFlattenWithArray(t *testing.T) {
-	inputSlice := []interface{}{[3]int{1, 2, 3}, 4, [3]int{7, 8, 9}}
+	inputSlice := []interface{}{[...]int{1, 2, 3}, 4, [...]int{7, 8, 9}}
 	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 7, 8, 9})
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)

@@ -6,7 +6,7 @@ import (
 )
 
 var slice = []int{1, 2, 3}
-var array = [3]int{1, 2, 3}
+var array = [...]int{1, 2, 3}
 
 func TestSlice(t *testing.T) {
 	assert := assert.New(t)

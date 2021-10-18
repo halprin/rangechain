@@ -51,13 +51,13 @@ func TestFromSliceEmpty(t *testing.T) {
 
 func TestArrayDoesntWorkForSlice(t *testing.T) {
 	assert.Panics(t, func() {
-		FromSlice([1]interface{}{})
+		FromSlice([...]interface{}{})
 	})
 }
 
 func TestArray(t *testing.T) {
 	assert.NotPanics(t, func() {
-		FromArray([0]interface{}{})
+		FromArray([...]interface{}{})
 	})
 }
 
