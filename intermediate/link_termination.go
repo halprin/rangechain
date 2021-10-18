@@ -13,6 +13,24 @@ func (receiver *Link) Slice() []interface{} {
 	}
 }
 
+func (receiver *Link) Channel() <-chan interface{} {
+	endChannel := make(chan interface{})
+
+	go func() {
+		for {
+			currentValue, err := receiver.generator()
+			if err != nil {
+				close(endChannel)
+				return
+			}
+
+			endChannel <- currentValue
+		}
+	}()
+
+	return endChannel
+}
+
 func (receiver *Link) ForEach(forEachFunction func(interface{})) {
 	for {
 		currentValue, err := receiver.generator()

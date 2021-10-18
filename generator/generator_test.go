@@ -55,14 +55,76 @@ func TestArrayDoesntWorkForSlice(t *testing.T) {
 	})
 }
 
-func TestArray(t *testing.T) {
+func TestArrayNotPanicsGivenArray(t *testing.T) {
 	assert.NotPanics(t, func() {
 		FromArray([...]interface{}{})
 	})
 }
 
-func TestSliceDoesntWorkForArray(t *testing.T) {
+func TestArrayDoesntWorkGivenSlice(t *testing.T) {
 	assert.Panics(t, func() {
 		FromArray([]interface{}{})
 	})
+}
+
+func TestChannelNotPanicsGivenChannel(t *testing.T) {
+	assert.NotPanics(t, func() {
+		FromChannel(createTestChannel(2))
+	})
+}
+
+func TestChannelDoesntWorkGivenSlice(t *testing.T) {
+	assert.Panics(t, func() {
+		FromChannel([]interface{}{})
+	})
+}
+
+func TestChannelEndsWithError(t *testing.T) {
+	assert := assert.New(t)
+
+	generator := FromChannel(createTestChannel(1))
+
+	_, err := generator()
+	assert.NoError(err)
+
+	_, err = generator()
+	assert.ErrorIs(err, Exhausted)
+}
+
+func TestChannelEndsWithErrorAndDoesntPanicAfterward(t *testing.T) {
+	assert := assert.New(t)
+
+	generator := FromChannel(createTestChannel(1))
+
+	_, err := generator()
+	assert.NoError(err)
+
+	_, err = generator()
+	assert.ErrorIs(err, Exhausted)
+
+	assert.NotPanics(func() {
+		_, err = generator()
+		assert.ErrorIs(err, Exhausted)
+	})
+}
+
+func TestChannelImmediatelyEnds(t *testing.T) {
+	generator := FromChannel(createTestChannel(0))
+
+	_, err := generator()
+
+	assert.ErrorIs(t, err, Exhausted)
+}
+
+func createTestChannel(size int) chan interface{} {
+	intChannel := make(chan interface{})
+
+	go func() {
+		for i := 0; i < size; i++ {
+			intChannel <- i
+		}
+		close(intChannel)
+	}()
+
+	return intChannel
 }

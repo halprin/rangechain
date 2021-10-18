@@ -1,7 +1,7 @@
 package slice_chain
 
 import (
-	"github.com/halprin/slice-chain/channelGenerator"
+	channelGeneratorImport "github.com/halprin/slice-chain/channelGenerator"
 	"github.com/halprin/slice-chain/channelIntermediate"
 	"github.com/halprin/slice-chain/generator"
 	"github.com/halprin/slice-chain/helper"
@@ -22,9 +22,16 @@ func FromArray(array interface{}) *intermediate.Link {
 	return link
 }
 
+func FromChannel(channel chan interface{}) *intermediate.Link {
+	channelGenerator := generator.FromChannel(channel)
+
+	link := intermediate.NewLink(channelGenerator)
+	return link
+}
+
 func FromSliceWithChannels(slice interface{}) *channelIntermediate.Link {
 	interfaceSlice := helper.InterfaceSlice(slice)
-	sliceGenerator := channelGenerator.FromSlice(interfaceSlice)
+	sliceGenerator := channelGeneratorImport.FromSlice(interfaceSlice)
 
 	link := channelIntermediate.NewLink(sliceGenerator)
 	return link

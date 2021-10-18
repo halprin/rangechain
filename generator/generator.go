@@ -24,6 +24,22 @@ func FromArray(array interface{}) func() (interface{}, error) {
 	return generatorFromSliceOrArray(array)
 }
 
+func FromChannel(channel interface{}) func() (interface{}, error) {
+	if !helper.IsChannel(channel) {
+		panic("non-channel type provided")
+	}
+
+	actualChannel := channel.(chan interface{})
+
+	return func() (interface{}, error) {
+		for value := range actualChannel {
+			return value, nil
+		}
+
+		return 0, Exhausted
+	}
+}
+
 func generatorFromSliceOrArray(sliceOrArray interface{}) func() (interface{}, error) {
 	concreteValue := reflect.ValueOf(sliceOrArray)
 
