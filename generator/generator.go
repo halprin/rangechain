@@ -13,7 +13,19 @@ func FromSlice(slice interface{}) func() (interface{}, error) {
 		panic("non-slice type provided")
 	}
 
-	concreteValue := reflect.ValueOf(slice)
+	return generatorFromSliceOrArray(slice)
+}
+
+func FromArray(array interface{}) func() (interface{}, error) {
+	if !helper.IsArray(array) {
+		panic("non-array type provided")
+	}
+
+	return generatorFromSliceOrArray(array)
+}
+
+func generatorFromSliceOrArray(sliceOrArray interface{}) func() (interface{}, error) {
+	concreteValue := reflect.ValueOf(sliceOrArray)
 
 	currentIndex := 0
 

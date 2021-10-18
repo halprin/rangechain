@@ -15,6 +15,13 @@ func FromSlice(slice interface{}) *intermediate.Link {
 	return link
 }
 
+func FromArray(array interface{}) *intermediate.Link {
+	arrayGenerator := generator.FromArray(array)
+
+	link := intermediate.NewLink(arrayGenerator)
+	return link
+}
+
 func FromSliceWithChannels(slice interface{}) *channelIntermediate.Link {
 	interfaceSlice := helper.InterfaceSlice(slice)
 	sliceGenerator := channelGenerator.FromSlice(interfaceSlice)

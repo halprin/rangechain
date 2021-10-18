@@ -104,6 +104,8 @@ func (receiver *Link) Flatten() *Link {
 
 				if helper.IsSlice(currentValue) {
 					currentGenerator = generator.FromSlice(currentValue)
+				} else if helper.IsArray(currentValue) {
+					currentGenerator = generator.FromArray(currentValue)
 				} else {
 					//it's some basic value, just return that
 					innerValue = currentValue
