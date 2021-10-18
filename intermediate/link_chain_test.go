@@ -118,6 +118,17 @@ func TestFlattenWithSliceMix(t *testing.T) {
 	assert.Equal(t, expectedSlice, actualSlice)
 }
 
+func TestFlattenWithArray(t *testing.T) {
+	inputSlice := []interface{}{[3]int{1, 2, 3}, 4, [3]int{7, 8, 9}}
+	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 7, 8, 9})
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	actualSlice := link.Flatten().Slice()
+
+	assert.Equal(t, expectedSlice, actualSlice)
+}
+
 func TestFlattenWithSliceAndMap(t *testing.T) {
 	innerMap := map[int]int{
 		4: 5,
