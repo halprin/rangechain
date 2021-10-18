@@ -18,6 +18,19 @@ func TestSlice(t *testing.T) {
 	assert.Equal(t, helper.InterfaceSlice(expectedSlice), actualSlice)
 }
 
+func TestChannel(t *testing.T) {
+	expectedSlice := []int{987, 8, 26}
+	generation := generator.FromSlice(helper.InterfaceSlice(expectedSlice))
+	link := NewLink(generation)
+
+	var seenItems []interface{}
+	for currentValue := range link.Channel() {
+		seenItems = append(seenItems, currentValue)
+	}
+
+	assert.Equal(t, helper.InterfaceSlice(expectedSlice), seenItems)
+}
+
 func TestForEach(t *testing.T) {
 	inputSlice := []int{987, 8, 26}
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
