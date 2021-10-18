@@ -48,3 +48,21 @@ func TestFromSliceEmpty(t *testing.T) {
 
 	assert.ErrorIs(t, err, Exhausted)
 }
+
+func TestArrayDoesntWorkForSlice(t *testing.T) {
+	assert.Panics(t, func() {
+		FromSlice([1]interface{}{})
+	})
+}
+
+func TestArray(t *testing.T) {
+	assert.NotPanics(t, func() {
+		FromArray([0]interface{}{})
+	})
+}
+
+func TestSliceDoesntWorkForArray(t *testing.T) {
+	assert.Panics(t, func() {
+		FromArray([]interface{}{})
+	})
+}
