@@ -144,6 +144,8 @@ func TestFlattenWithChannel(t *testing.T) {
 }
 
 func TestFlattenWithSliceAndMap(t *testing.T) {
+	assert := assert.New(t)
+
 	key1 := 4
 	value1 := 5
 	key2 := 6
@@ -176,7 +178,15 @@ func TestFlattenWithSliceAndMap(t *testing.T) {
 
 	actualSlice := link.Flatten().Slice()
 
-	assert.Equal(t, expectedSlice, actualSlice)
+	//not testing the order of the entire expected slice because we are not guaranteed the order in which a map is iterated over
+	assert.ElementsMatch(expectedSlice, actualSlice)
+	//test the order for the non-map flattened parts
+	assert.Equal(expectedSlice[0], actualSlice[0])
+	assert.Equal(expectedSlice[1], actualSlice[1])
+	assert.Equal(expectedSlice[2], actualSlice[2])
+	assert.Equal(expectedSlice[5], actualSlice[5])
+	assert.Equal(expectedSlice[6], actualSlice[6])
+	assert.Equal(expectedSlice[7], actualSlice[7])
 }
 
 func TestSort(t *testing.T) {

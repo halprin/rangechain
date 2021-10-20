@@ -8,24 +8,27 @@ import (
 
 func TestFromSlice(t *testing.T) {
 	inputSlice := []string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
+	expectedOutput := []interface{}{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
 	chain := FromSlice(inputSlice)
 
-	assert.ElementsMatch(t, chain.Slice(), inputSlice)
+	assert.Equal(t, expectedOutput, chain.Slice())
 }
 
 func TestFromArray(t *testing.T) {
 	input := [...]string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
+	expectedOutput := []interface{}{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
 	chain := FromArray(input)
 
-	assert.ElementsMatch(t, chain.Slice(), input)
+	assert.Equal(t, expectedOutput, chain.Slice())
 }
 
 func TestFromChannel(t *testing.T) {
 	innerInput := []string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
+	expectedOutput := []interface{}{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
 	input := createTestChannel(innerInput)
 	chain := FromChannel(input)
 
-	assert.ElementsMatch(t, chain.Slice(), innerInput)
+	assert.Equal(t, expectedOutput, chain.Slice())
 }
 
 func TestFromMap(t *testing.T) {
@@ -58,7 +61,8 @@ func TestFromMap(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, expectedOutput, chain.Slice())
+	//not testing the order because we are not guaranteed the order in which a map is iterated over
+	assert.ElementsMatch(t, expectedOutput, chain.Slice())
 }
 
 func createTestChannel(stringSlice []string) chan string {
