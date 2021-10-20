@@ -144,21 +144,49 @@ func TestFlattenWithChannel(t *testing.T) {
 }
 
 func TestFlattenWithSliceAndMap(t *testing.T) {
+	assert := assert.New(t)
+
+	key1 := 4
+	value1 := 5
+	key2 := 6
+	value2 := 7
+
 	innerMap := map[int]int{
-		4: 5,
-		6: 7,
+		key1: value1,
+		key2: value2,
 	}
 	inputSlice := []interface{}{[]int{1, 2, 3}, innerMap, []int{7, 8, 9}}
-	//notice that the expected just puts the map right back into the slice without expanding it
-	//in the future we'll support expanding other containers
-	expectedSlice := []interface{}{1, 2, 3, innerMap, 7, 8, 9}
+	expectedSlice := []interface{}{
+		1,
+		2,
+		3,
+		generator.MapTuple{
+			Key:   key1,
+			Value: value1,
+		},
+		generator.MapTuple{
+			Key:   key2,
+			Value: value2,
+		},
+		7,
+		8,
+		9,
+	}
 
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
 	actualSlice := link.Flatten().Slice()
 
-	assert.Equal(t, expectedSlice, actualSlice)
+	//not testing the order of the entire expected slice because we are not guaranteed the order in which a map is iterated over
+	assert.ElementsMatch(expectedSlice, actualSlice)
+	//test the order for the non-map flattened parts
+	assert.Equal(expectedSlice[0], actualSlice[0])
+	assert.Equal(expectedSlice[1], actualSlice[1])
+	assert.Equal(expectedSlice[2], actualSlice[2])
+	assert.Equal(expectedSlice[5], actualSlice[5])
+	assert.Equal(expectedSlice[6], actualSlice[6])
+	assert.Equal(expectedSlice[7], actualSlice[7])
 }
 
 func TestSort(t *testing.T) {

@@ -25,3 +25,20 @@ func TestFunStuff(t *testing.T) {
 
 	fmt.Println(outputSlice)
 }
+
+func TestReduceToMapExample(t *testing.T) {
+	stringSlice := []string{"DogCows", "goes", "Moof", "Do", "you", "like", "Clarus", "the", "DogCow"}
+	chain := FromSlice(stringSlice)
+
+	outputMap := chain.
+		ReduceWithInitialValue(func(firstItem interface{}, secondItem interface{}) interface{} {
+			reductionMap := firstItem.(map[string]int)
+			stringItem := secondItem.(string)
+
+			reductionMap[stringItem] = len(stringItem)
+
+			return reductionMap
+		}, map[string]int{})
+
+	fmt.Println(outputMap)
+}

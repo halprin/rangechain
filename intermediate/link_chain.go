@@ -108,6 +108,8 @@ func (receiver *Link) Flatten() *Link {
 					currentGenerator = generator.FromArray(currentValue)
 				} else if helper.IsChannel(currentValue) {
 					currentGenerator = generator.FromChannel(currentValue)
+				} else if helper.IsMap(currentValue) {
+					currentGenerator = generator.FromMap(currentValue)
 				} else {
 					//it's some basic value, just return that
 					innerValue = currentValue

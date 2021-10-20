@@ -8,6 +8,11 @@ import (
 
 var Exhausted = errors.New("generator exhausted")
 
+type MapTuple struct {
+	Key   interface{}
+	Value interface{}
+}
+
 func FromSlice(slice interface{}) func() (interface{}, error) {
 	if !helper.IsSlice(slice) {
 		panic("non-slice type provided")
@@ -29,14 +34,40 @@ func FromChannel(channel interface{}) func() (interface{}, error) {
 		panic("non-channel type provided")
 	}
 
-	actualChannel := channel.(chan interface{})
+	concreteValue := reflect.ValueOf(channel)
 
 	return func() (interface{}, error) {
-		for value := range actualChannel {
-			return value, nil
+		for {
+			value, ok := concreteValue.Recv()
+			if !ok {
+				return 0, Exhausted
+			}
+
+			return value.Interface(), nil
+		}
+	}
+}
+
+func FromMap(aMap interface{}) func() (interface{}, error) {
+	if !helper.IsMap(aMap) {
+		panic("non-map type provided")
+	}
+
+	concreteValue := reflect.ValueOf(aMap)
+	mapIterator := concreteValue.MapRange()
+
+	return func() (interface{}, error) {
+		hasNext := mapIterator.Next()
+		if !hasNext {
+			return 0, Exhausted
 		}
 
-		return 0, Exhausted
+		mapTuple := MapTuple{
+			Key:   mapIterator.Key().Interface(),
+			Value: mapIterator.Value().Interface(),
+		}
+
+		return mapTuple, nil
 	}
 }
 
