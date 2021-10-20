@@ -144,14 +144,32 @@ func TestFlattenWithChannel(t *testing.T) {
 }
 
 func TestFlattenWithSliceAndMap(t *testing.T) {
+	key1 := 4
+	value1 := 5
+	key2 := 6
+	value2 := 7
+
 	innerMap := map[int]int{
-		4: 5,
-		6: 7,
+		key1: value1,
+		key2: value2,
 	}
 	inputSlice := []interface{}{[]int{1, 2, 3}, innerMap, []int{7, 8, 9}}
-	//notice that the expected just puts the map right back into the slice without expanding it
-	//in the future we'll support expanding other containers
-	expectedSlice := []interface{}{1, 2, 3, innerMap, 7, 8, 9}
+	expectedSlice := []interface{}{
+		1,
+		2,
+		3,
+		generator.MapTuple{
+			Key:   key1,
+			Value: value1,
+		},
+		generator.MapTuple{
+			Key:   key2,
+			Value: value2,
+		},
+		7,
+		8,
+		9,
+	}
 
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
