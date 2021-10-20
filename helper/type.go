@@ -16,3 +16,8 @@ func IsChannel(value interface{}) bool {
 	concreteValue := reflect.ValueOf(value)
 	return concreteValue.Kind() == reflect.Chan
 }
+
+func IsMap(value interface{}) bool {
+	concreteValue := reflect.ValueOf(value)
+	return concreteValue.Kind() == reflect.Map
+}

@@ -27,8 +27,8 @@ func TestFromChannel(t *testing.T) {
 	assert.ElementsMatch(t, chain.Slice(), innerInput)
 }
 
-func createTestChannel(stringSlice []string) chan interface{} {
-	stringChannel := make(chan interface{})
+func createTestChannel(stringSlice []string) chan string {
+	stringChannel := make(chan string)
 
 	go func() {
 		for _, currentString := range stringSlice {

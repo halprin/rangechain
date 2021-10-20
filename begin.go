@@ -22,10 +22,17 @@ func FromArray(array interface{}) *intermediate.Link {
 	return link
 }
 
-func FromChannel(channel chan interface{}) *intermediate.Link {
+func FromChannel(channel interface{}) *intermediate.Link {
 	channelGenerator := generator.FromChannel(channel)
 
 	link := intermediate.NewLink(channelGenerator)
+	return link
+}
+
+func FromMap(aMap map[interface{}]interface{}) *intermediate.Link {
+	mapGenerator := generator.FromMap(aMap)
+
+	link := intermediate.NewLink(mapGenerator)
 	return link
 }
 

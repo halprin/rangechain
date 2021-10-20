@@ -8,6 +8,11 @@ import (
 
 var Exhausted = errors.New("generator exhausted")
 
+type MapTuple struct {
+	Key   interface{}
+	Value interface{}
+}
+
 func FromSlice(slice interface{}) func() (interface{}, error) {
 	if !helper.IsSlice(slice) {
 		panic("non-slice type provided")
@@ -29,15 +34,44 @@ func FromChannel(channel interface{}) func() (interface{}, error) {
 		panic("non-channel type provided")
 	}
 
-	actualChannel := channel.(chan interface{})
+	concreteValue := reflect.ValueOf(channel)
 
 	return func() (interface{}, error) {
-		for value := range actualChannel {
-			return value, nil
-		}
+		for {
+			value, ok := concreteValue.Recv()
+			if !ok {
+				return 0, Exhausted
+			}
 
-		return 0, Exhausted
+			return value.Interface(), nil
+		}
 	}
+}
+
+func FromMap(aMap interface{}) func() (interface{}, error) {
+	if !helper.IsMap(aMap) {
+		panic("non-map type provided")
+	}
+
+	actualMap := aMap.(map[interface{}]interface{})
+	mapChannel := make(chan MapTuple)
+
+	//convert to using channels because...
+	//there is no way to directly access into a map using an index,
+	//nor a way to have the "for range" start where the last call to the generator left off.
+
+	go func() {
+		for key, value := range actualMap {
+			mapTuple := MapTuple{
+				Key:   key,
+				Value: value,
+			}
+
+			mapChannel <- mapTuple
+		}
+	}()
+
+	return FromChannel(mapChannel)
 }
 
 func generatorFromSliceOrArray(sliceOrArray interface{}) func() (interface{}, error) {

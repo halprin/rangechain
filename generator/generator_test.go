@@ -116,6 +116,35 @@ func TestChannelImmediatelyEnds(t *testing.T) {
 	assert.ErrorIs(t, err, Exhausted)
 }
 
+func TestMapNotPanicsGivenMap(t *testing.T) {
+	assert.NotPanics(t, func() {
+		FromMap(map[string]int{
+			"DogCow": 1,
+			"Moof": 1976,
+		})
+	})
+}
+
+func TestMapDoesntWorkGivenSlice(t *testing.T) {
+	assert.Panics(t, func() {
+		FromMap([]interface{}{})
+	})
+}
+
+func TestMapEndsWithError(t *testing.T) {
+	assert := assert.New(t)
+
+	generator := FromMap(map[string]int{
+		"DogCow": 3,
+	})
+
+	_, err := generator()
+	assert.NoError(err)
+
+	_, err = generator()
+	assert.ErrorIs(err, Exhausted)
+}
+
 func createTestChannel(size int) chan interface{} {
 	intChannel := make(chan interface{})
 
