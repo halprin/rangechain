@@ -1,6 +1,6 @@
 package intermediate
 
-import "github.com/halprin/slice-chain/generator"
+import "github.com/halprin/rangechain/generator"
 
 func (receiver *Link) MapParallel(mapFunction func(interface{}) interface{}) *Link {
 	computedValues := false

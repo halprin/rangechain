@@ -2,8 +2,8 @@ package intermediate
 
 
 import (
-	"github.com/halprin/slice-chain/generator"
-	"github.com/halprin/slice-chain/helper"
+	"github.com/halprin/rangechain/generator"
+	"github.com/halprin/rangechain/helper"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

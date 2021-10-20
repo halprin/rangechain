@@ -1,11 +1,11 @@
 package slice_chain
 
 import (
-	channelGeneratorImport "github.com/halprin/slice-chain/channelGenerator"
-	"github.com/halprin/slice-chain/channelIntermediate"
-	"github.com/halprin/slice-chain/generator"
-	"github.com/halprin/slice-chain/helper"
-	"github.com/halprin/slice-chain/intermediate"
+	channelGeneratorImport "github.com/halprin/rangechain/channelGenerator"
+	"github.com/halprin/rangechain/channelIntermediate"
+	"github.com/halprin/rangechain/generator"
+	"github.com/halprin/rangechain/helper"
+	"github.com/halprin/rangechain/intermediate"
 )
 
 func FromSlice(slice interface{}) *intermediate.Link {
