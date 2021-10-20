@@ -1,4 +1,4 @@
-package slice_chain
+package rangechain
 
 import (
 	"testing"
@@ -14,24 +14,12 @@ func BenchmarkIntermediate10(b *testing.B) {
 	benchmarkIntermediate(b, size10Slice)
 }
 
-func BenchmarkChannelIntermediate10(b *testing.B) {
-	benchmarkChannelIntermediate(b, size10Slice)
-}
-
 func BenchmarkIntermediate100(b *testing.B) {
 	benchmarkIntermediate(b, size100Slice)
 }
 
-func BenchmarkChannelIntermediate100(b *testing.B) {
-	benchmarkChannelIntermediate(b, size100Slice)
-}
-
 func BenchmarkIntermediate1000(b *testing.B) {
 	benchmarkIntermediate(b, size1000Slice)
-}
-
-func BenchmarkChannelIntermediate1000(b *testing.B) {
-	benchmarkChannelIntermediate(b, size1000Slice)
 }
 
 func BenchmarkFlatten1000(b *testing.B) {
@@ -77,18 +65,6 @@ func makeIntSliceOfSize(size int) []int {
 func benchmarkIntermediate(b *testing.B, inputSlice []int) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
 		FromSlice(inputSlice).Filter(func(value interface{}) bool {
-			intValue := value.(int)
-			return intValue % 2 == 0
-		}).Map(func(value interface{}) interface{} {
-			intValue := value.(int)
-			return intValue * 2 + 2
-		}).Slice()
-	}
-}
-
-func benchmarkChannelIntermediate(b *testing.B, inputSlice []int) {
-	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSliceWithChannels(inputSlice).Filter(func(value interface{}) bool {
 			intValue := value.(int)
 			return intValue % 2 == 0
 		}).Map(func(value interface{}) interface{} {

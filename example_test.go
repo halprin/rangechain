@@ -1,4 +1,4 @@
-package slice_chain
+package rangechain
 
 import (
 	"fmt"
