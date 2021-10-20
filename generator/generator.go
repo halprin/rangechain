@@ -53,25 +53,22 @@ func FromMap(aMap interface{}) func() (interface{}, error) {
 		panic("non-map type provided")
 	}
 
-	actualMap := aMap.(map[interface{}]interface{})
-	mapChannel := make(chan MapTuple)
+	concreteValue := reflect.ValueOf(aMap)
+	mapIterator := concreteValue.MapRange()
 
-	//convert to using channels because...
-	//there is no way to directly access into a map using an index,
-	//nor a way to have the "for range" start where the last call to the generator left off.
-
-	go func() {
-		for key, value := range actualMap {
-			mapTuple := MapTuple{
-				Key:   key,
-				Value: value,
-			}
-
-			mapChannel <- mapTuple
+	return func() (interface{}, error) {
+		hasNext := mapIterator.Next()
+		if !hasNext {
+			return 0, Exhausted
 		}
-	}()
 
-	return FromChannel(mapChannel)
+		mapTuple := MapTuple{
+			Key:   mapIterator.Key().Interface(),
+			Value: mapIterator.Value().Interface(),
+		}
+
+		return mapTuple, nil
+	}
 }
 
 func generatorFromSliceOrArray(sliceOrArray interface{}) func() (interface{}, error) {
