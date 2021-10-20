@@ -29,7 +29,7 @@ func FromChannel(channel interface{}) *intermediate.Link {
 	return link
 }
 
-func FromMap(aMap map[interface{}]interface{}) *intermediate.Link {
+func FromMap(aMap interface{}) *intermediate.Link {
 	mapGenerator := generator.FromMap(aMap)
 
 	link := intermediate.NewLink(mapGenerator)
