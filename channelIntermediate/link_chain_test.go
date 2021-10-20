@@ -1,8 +1,8 @@
 package channelIntermediate
 
 import (
-	generator "github.com/halprin/slice-chain/channelGenerator"
-	"github.com/halprin/slice-chain/helper"
+	generator "github.com/halprin/rangechain/channelGenerator"
+	"github.com/halprin/rangechain/helper"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

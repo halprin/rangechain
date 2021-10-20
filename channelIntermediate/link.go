@@ -1,7 +1,7 @@
 package channelIntermediate
 
 import (
-	"github.com/halprin/slice-chain/helper"
+	"github.com/halprin/rangechain/helper"
 )
 
 type Link struct {

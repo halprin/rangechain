@@ -1,4 +1,4 @@
-module github.com/halprin/slice-chain
+module github.com/halprin/rangechain
 
 go 1.16
 

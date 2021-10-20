@@ -2,7 +2,7 @@ package generator
 
 import (
 	"errors"
-	"github.com/halprin/slice-chain/helper"
+	"github.com/halprin/rangechain/helper"
 	"reflect"
 )
 
