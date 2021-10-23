@@ -12,7 +12,7 @@ import (
 func TestSlice(t *testing.T) {
 	assert := assert.New(t)
 	expectedSlice := []int{987, 8, 26}
-	generation := generator.FromSlice(helper.InterfaceSlice(expectedSlice))
+	generation := generator.FromSlice(expectedSlice)
 	link := NewLink(generation)
 
 	actualSlice, err := link.Slice()
@@ -23,7 +23,7 @@ func TestSlice(t *testing.T) {
 
 func TestChannel(t *testing.T) {
 	expectedSlice := []int{987, 8, 26}
-	generation := generator.FromSlice(helper.InterfaceSlice(expectedSlice))
+	generation := generator.FromSlice(expectedSlice)
 	link := NewLink(generation)
 
 	var seenItems []interface{}
@@ -36,7 +36,7 @@ func TestChannel(t *testing.T) {
 
 func TestForEach(t *testing.T) {
 	inputSlice := []int{987, 8, 26}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	var seenItems []interface{}
@@ -55,7 +55,7 @@ func TestForEachParallel(t *testing.T) {
 		26: true,
 		8: true,
 	}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	seenItems := map[int]bool{}
@@ -83,7 +83,7 @@ func TestForEachParallel(t *testing.T) {
 
 func TestCount(t *testing.T) {
 	inputSlice := []int{987, 8, 26}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	actualCount := link.Count()
@@ -95,7 +95,7 @@ func TestFirst(t *testing.T) {
 	assert := assert.New(t)
 
 	inputSlice := []int{987, 8, 26}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	actualFirst := link.First()
@@ -106,7 +106,7 @@ func TestFirst(t *testing.T) {
 
 func TestFirstWithEmptySlice(t *testing.T) {
 	var inputSlice []int
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	actualFirst := link.First()
@@ -118,7 +118,7 @@ func TestLast(t *testing.T) {
 	assert := assert.New(t)
 
 	inputSlice := []int{987, 8, 26}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	actualLast := link.Last()
@@ -129,7 +129,7 @@ func TestLast(t *testing.T) {
 
 func TestLastWithEmptySlice(t *testing.T) {
 	var inputSlice []int
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	actualLast := link.Last()
@@ -139,7 +139,7 @@ func TestLastWithEmptySlice(t *testing.T) {
 
 func TestAllMatch(t *testing.T) {
 	inputSlice := []int{984, 8, 26}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	allMatchFunction := func(value interface{}) bool {
@@ -153,7 +153,7 @@ func TestAllMatch(t *testing.T) {
 
 func TestNotAllMatch(t *testing.T) {
 	inputSlice := []int{984, 7, 26}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	allMatchFunction := func(value interface{}) bool {
@@ -167,7 +167,7 @@ func TestNotAllMatch(t *testing.T) {
 
 func TestAllMatchWithEmptySlice(t *testing.T) {
 	var inputSlice []int
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	allMatchFunction := func(value interface{}) bool {
@@ -181,7 +181,7 @@ func TestAllMatchWithEmptySlice(t *testing.T) {
 
 func TestAnyMatch(t *testing.T) {
 	inputSlice := []int{985, 3, 26}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	anyMatchFunction := func(value interface{}) bool {
@@ -195,7 +195,7 @@ func TestAnyMatch(t *testing.T) {
 
 func TestNotAnyMatch(t *testing.T) {
 	inputSlice := []int{985, 7, 29}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	anyMatchFunction := func(value interface{}) bool {
@@ -209,7 +209,7 @@ func TestNotAnyMatch(t *testing.T) {
 
 func TestAnyMatchWithEmptySlice(t *testing.T) {
 	var inputSlice []int
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	anyMatchFunction := func(value interface{}) bool {
@@ -223,7 +223,7 @@ func TestAnyMatchWithEmptySlice(t *testing.T) {
 
 func TestNoneMatch(t *testing.T) {
 	inputSlice := []int{985, 3, 27}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	noneMatchFunction := func(value interface{}) bool {
@@ -237,7 +237,7 @@ func TestNoneMatch(t *testing.T) {
 
 func TestNotNoneMatch(t *testing.T) {
 	inputSlice := []int{985, 7, 28}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	noneMatchFunction := func(value interface{}) bool {
@@ -251,7 +251,7 @@ func TestNotNoneMatch(t *testing.T) {
 
 func TestNoneMatchWithEmptySlice(t *testing.T) {
 	var inputSlice []int
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	noneMatchFunction := func(value interface{}) bool {
@@ -268,7 +268,7 @@ func TestReduce(t *testing.T) {
 
 	inputSlice := []int{987, 8, 26}
 	expectedValue := inputSlice[0] * inputSlice[1] * inputSlice[2]
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
@@ -287,7 +287,7 @@ func TestReduceWithOneItem(t *testing.T) {
 	assert := assert.New(t)
 
 	inputSlice := []int{987}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
@@ -304,7 +304,7 @@ func TestReduceWithOneItem(t *testing.T) {
 
 func TestReduceWithZeroItems(t *testing.T) {
 	inputSlice := []int{}
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
@@ -322,7 +322,7 @@ func TestReduceWithInitialValue(t *testing.T) {
 	inputSlice := []int{987, 8, 26}
 	inputInitialValue := 4
 	expectedValue := inputInitialValue * inputSlice[0] * inputSlice[1] * inputSlice[2]
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
@@ -339,7 +339,7 @@ func TestReduceWithInitialValue(t *testing.T) {
 func TestReduceWithInitialValueWithOneItem(t *testing.T) {
 	inputSlice := []int{987}
 	inputInitialValue := 4
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
@@ -356,7 +356,7 @@ func TestReduceWithInitialValueWithOneItem(t *testing.T) {
 func TestReduceWithInitialValueWithZeroItems(t *testing.T) {
 	inputSlice := []int{}
 	inputInitialValue := 4
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {

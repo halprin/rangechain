@@ -16,7 +16,7 @@ func TestMapParallel(t *testing.T) {
 		expectedOutput = append(expectedOutput, len(stringValue))
 	}
 
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	mapFunction := func(value interface{}) interface{} {
@@ -35,7 +35,7 @@ func TestFilterParallel(t *testing.T) {
 
 	inputSlice := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
 	expectedSlice := helper.InterfaceSlice([]int{7, 9, 6, 8})
-	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
 	filterFunction := func(value interface{}) bool {
