@@ -62,13 +62,35 @@ func TestFilterParallel(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	filterFunction := func(value interface{}) bool {
+	filterFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
-		return intValue > 5
+		return intValue > 5, nil
 	}
 
 	actualSlice, err := link.FilterParallel(filterFunction).Slice()
 
 	assert.Equal(expectedSlice, actualSlice)
 	assert.Nil(err)
+}
+
+func TestFilterParallelHasError(t *testing.T) {
+	assert := assert.New(t)
+
+	expectedError := errors.New("an example error")
+	errorValue := 9
+	inputSlice := []int{7, 4, 2, 3, errorValue, 5, 6, 0, 8, 1}
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	filterFunction := func(value interface{}) (bool, error) {
+		intValue := value.(int)
+		if intValue == errorValue {
+			return false, expectedError
+		}
+		return intValue > 5, nil
+	}
+
+	_, err := link.FilterParallel(filterFunction).Slice()
+
+	assert.Equal(expectedError, err)
 }
