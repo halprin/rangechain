@@ -45,9 +45,9 @@ func BenchmarkSleepWithSerialMap(b *testing.B) {
 
 func BenchmarkSleepWithParallelMap(b *testing.B) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSlice(size10Slice).MapParallel(func(value interface{}) interface{} {
+		FromSlice(size10Slice).MapParallel(func(value interface{}) (interface{}, error) {
 			time.Sleep(100 * time.Millisecond)
-			return value
+			return value, nil
 		}).Slice()
 	}
 }

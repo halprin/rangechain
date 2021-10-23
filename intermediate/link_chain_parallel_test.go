@@ -1,6 +1,7 @@
 package intermediate
 
 import (
+	"errors"
 	"github.com/halprin/rangechain/generator"
 	"github.com/halprin/rangechain/helper"
 	"github.com/stretchr/testify/assert"
@@ -19,15 +20,38 @@ func TestMapParallel(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	mapFunction := func(value interface{}) interface{} {
+	mapFunction := func(value interface{}) (interface{}, error) {
 		stringValue := value.(string)
-		return len(stringValue)
+		return len(stringValue), nil
 	}
 
 	actualSlice, err := link.MapParallel(mapFunction).Slice()
 
 	assert.Equal(expectedOutput, actualSlice)
 	assert.Nil(err)
+}
+
+func TestMapParallelHasError(t *testing.T) {
+	assert := assert.New(t)
+
+	expectedError := errors.New("an example error")
+	errorValue := "Do"
+	inputSlice := []string{"DogCows", "goes", "Moof!", errorValue, "you", "like", "Clarus", "the", "DogCow?"}
+
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	mapFunction := func(value interface{}) (interface{}, error) {
+		stringValue := value.(string)
+		if stringValue == errorValue {
+			return 0, expectedError
+		}
+		return len(stringValue), nil
+	}
+
+	_, err := link.MapParallel(mapFunction).Slice()
+
+	assert.Equal(expectedError, err)
 }
 
 func TestFilterParallel(t *testing.T) {
