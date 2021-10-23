@@ -109,16 +109,18 @@ func (receiver *Link) First() (*interface{}, error) {
 	return &value, nil
 }
 
-func (receiver *Link) Last() *interface{} {
-	var last *interface{}
+func (receiver *Link) Last() (*interface{}, error) {
+	var lastValue *interface{}
+	var lastError error
 
 	for {
 		currentValue, err := receiver.generator()
-		if err != nil {
-			return last
+		if err != nil && errors.Is(err, generator.Exhausted) {
+			return lastValue, lastError
 		}
 
-		last = &currentValue
+		lastValue = &currentValue
+		lastError = err
 	}
 }
 
