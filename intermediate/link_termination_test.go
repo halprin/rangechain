@@ -5,6 +5,7 @@ import (
 	"github.com/halprin/rangechain/generator"
 	"github.com/halprin/rangechain/helper"
 	"github.com/stretchr/testify/assert"
+	"sync"
 	"testing"
 )
 
@@ -43,6 +44,39 @@ func TestForEach(t *testing.T) {
 	link.ForEach(forEachFunction)
 
 	assert.ElementsMatch(t, inputSlice, seenItems)
+}
+
+func TestForEachParallel(t *testing.T) {
+	inputSlice := []int{987, 8, 26}
+	expectedOutput := map[int]bool{
+		987: true,
+		26: true,
+		8: true,
+	}
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	seenItems := map[int]bool{}
+	seenItemsLock := sync.RWMutex{}
+
+	forEachFunction := func(value interface{}) {
+		actualInt := value.(int)
+		seenItemsLock.Lock()
+		seenItems[actualInt] = true
+		seenItemsLock.Unlock()
+	}
+	link.ForEachParallel(forEachFunction)
+
+	for {
+		seenItemsLock.RLock()
+		if len(seenItems) != len(expectedOutput) {
+			seenItemsLock.RUnlock()
+			break
+		}
+		seenItemsLock.RUnlock()
+	}
+	assert.Equal(t, expectedOutput, seenItems)
+
 }
 
 func TestCount(t *testing.T) {
