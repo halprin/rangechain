@@ -175,20 +175,39 @@ func TestFirst(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	actualFirst := link.First()
+	actualFirst, err := link.First()
 
 	assert.NotNil(actualFirst)
 	assert.Equal(inputSlice[0], *actualFirst)
+	assert.Nil(err)
 }
 
 func TestFirstWithEmptySlice(t *testing.T) {
+	assert := assert.New(t)
+
 	var inputSlice []int
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	actualFirst := link.First()
+	actualFirst, err := link.First()
 
-	assert.Nil(t, actualFirst)
+	assert.Nil(actualFirst)
+	assert.Nil(err)
+}
+
+func TestFirstHasError(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 987
+	inputSlice := []int{errorValue, 8, 26}
+	expectedError := errors.New("an example error yo")
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	actualFirst, err := link.First()
+
+	assert.Nil(actualFirst)
+	assert.Equal(expectedError, err)
 }
 
 func TestLast(t *testing.T) {

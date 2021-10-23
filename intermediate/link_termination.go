@@ -96,13 +96,17 @@ func (receiver *Link) Count() (int, error) {
 	}
 }
 
-func (receiver *Link) First() *interface{} {
+func (receiver *Link) First() (*interface{}, error) {
 	value, err := receiver.generator()
 	if err != nil {
-		return nil
+		if errors.Is(err, generator.Exhausted) {
+			return nil, nil
+		} else if !errors.Is(err, generator.Exhausted) {
+			return nil, err
+		}
 	}
 
-	return &value
+	return &value, nil
 }
 
 func (receiver *Link) Last() *interface{} {
