@@ -1,6 +1,7 @@
 package intermediate
 
 import (
+	"errors"
 	"github.com/halprin/rangechain/generator"
 	"github.com/halprin/rangechain/helper"
 	"sort"
@@ -122,7 +123,7 @@ func (receiver *Link) Flatten() *Link {
 			}
 
 			innerValue, err = currentGenerator()
-			if err != nil {
+			if errors.Is(err, generator.Exhausted) {
 				//the current generator is exhausted, set it to nil so we grab the next generator
 				innerValue = nil
 				currentGenerator = nil
