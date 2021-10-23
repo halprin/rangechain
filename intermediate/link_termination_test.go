@@ -91,6 +91,8 @@ func TestForEachHasError(t *testing.T) {
 }
 
 func TestForEachParallel(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{987, 8, 26}
 	expectedOutput := map[int]bool{
 		987: true,
@@ -109,7 +111,7 @@ func TestForEachParallel(t *testing.T) {
 		seenItems[actualInt] = true
 		seenItemsLock.Unlock()
 	}
-	link.ForEachParallel(forEachFunction)
+	err := link.ForEachParallel(forEachFunction)
 
 	for {
 		seenItemsLock.RLock()
@@ -119,8 +121,23 @@ func TestForEachParallel(t *testing.T) {
 		}
 		seenItemsLock.RUnlock()
 	}
-	assert.Equal(t, expectedOutput, seenItems)
+	assert.Equal(expectedOutput, seenItems)
+	assert.Nil(err)
+}
 
+func TestForEachParallelHasError(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 8
+	inputSlice := []int{987, errorValue, 26}
+	expectedError := errors.New("an example error yo")
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	forEachFunction := func(value interface{}) {}
+	err := link.ForEachParallel(forEachFunction)
+
+	assert.Equal(expectedError, err)
 }
 
 func TestCount(t *testing.T) {

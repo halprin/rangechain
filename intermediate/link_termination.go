@@ -64,11 +64,15 @@ func (receiver *Link) ForEach(forEachFunction func(interface{})) error {
 	}
 }
 
-func (receiver *Link) ForEachParallel(forEachFunction func(interface{})) {
+func (receiver *Link) ForEachParallel(forEachFunction func(interface{})) error {
 	for {
 		currentValue, err := receiver.generator()
 		if err != nil {
-			return
+			if errors.Is(err, generator.Exhausted) {
+				return nil
+			} else if !errors.Is(err, generator.Exhausted) {
+				return err
+			}
 		}
 
 		go forEachFunction(currentValue)
