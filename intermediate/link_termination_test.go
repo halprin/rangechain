@@ -141,13 +141,31 @@ func TestForEachParallelHasError(t *testing.T) {
 }
 
 func TestCount(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 8
+	inputSlice := []int{987, errorValue, 26}
+	expectedError := errors.New("an example error yo")
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	actualCount, err := link.Count()
+
+	assert.Equal(len(inputSlice), actualCount)
+	assert.Equal(expectedError, err)
+}
+
+func TestCountWithErrorStillCounts(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{987, 8, 26}
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	actualCount := link.Count()
+	actualCount, err := link.Count()
 
-	assert.Equal(t, len(inputSlice), actualCount)
+	assert.Equal(len(inputSlice), actualCount)
+	assert.Nil(err)
 }
 
 func TestFirst(t *testing.T) {

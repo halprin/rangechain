@@ -79,12 +79,17 @@ func (receiver *Link) ForEachParallel(forEachFunction func(interface{})) error {
 	}
 }
 
-func (receiver *Link) Count() int {
+func (receiver *Link) Count() (int, error) {
 	count := 0
+	var firstError error
 	for {
 		_, err := receiver.generator()
 		if err != nil {
-			return count
+			if errors.Is(err, generator.Exhausted) {
+				return count, firstError
+			} else if !errors.Is(err, generator.Exhausted) {
+				firstError = err
+			}
 		}
 
 		count++
