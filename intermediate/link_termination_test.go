@@ -61,6 +61,8 @@ func TestChannelHasError(t *testing.T) {
 }
 
 func TestForEach(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{987, 8, 26}
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
@@ -69,9 +71,23 @@ func TestForEach(t *testing.T) {
 	forEachFunction := func(value interface{}) {
 		seenItems = append(seenItems, value)
 	}
-	link.ForEach(forEachFunction)
+	err := link.ForEach(forEachFunction)
 
-	assert.ElementsMatch(t, inputSlice, seenItems)
+	assert.ElementsMatch(inputSlice, seenItems)
+	assert.Nil(err)
+}
+
+func TestForEachHasError(t *testing.T) {
+	errorValue := 8
+	inputSlice := []int{987, errorValue, 26}
+	expectedError := errors.New("an example error yo")
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	forEachFunction := func(value interface{}) {}
+	err := link.ForEach(forEachFunction)
+
+	assert.Equal(t, expectedError, err)
 }
 
 func TestForEachParallel(t *testing.T) {
