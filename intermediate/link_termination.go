@@ -42,6 +42,17 @@ func (receiver *Link) ForEach(forEachFunction func(interface{})) {
 	}
 }
 
+func (receiver *Link) ForEachParallel(forEachFunction func(interface{})) {
+	for {
+		currentValue, err := receiver.generator()
+		if err != nil {
+			return
+		}
+
+		go forEachFunction(currentValue)
+	}
+}
+
 func (receiver *Link) Count() int {
 	count := 0
 	for {
