@@ -10,9 +10,9 @@ func TestFunStuff(t *testing.T) {
 	chain := FromSlice(stringSlice)
 
 	outputSlice := chain.
-		Map(func(value interface{}) interface{} {
+		Map(func(value interface{}) (interface{}, error) {
 			stringValue := value.(string)
-			return stringValue + " not"
+			return stringValue + " not", nil
 		}).
 		Filter(func(value interface{}) bool {
 			stringValue := value.(string)

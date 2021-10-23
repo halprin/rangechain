@@ -1,6 +1,7 @@
 package intermediate
 
 import (
+	"errors"
 	"github.com/halprin/rangechain/generator"
 	"github.com/halprin/rangechain/helper"
 	"github.com/stretchr/testify/assert"
@@ -17,14 +18,41 @@ func TestMap(t *testing.T) {
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
-	mapFunction := func(value interface{}) interface{} {
+	mapFunction := func(value interface{}) (interface{}, error) {
 		stringValue := value.(string)
-		return len(stringValue)
+		return len(stringValue), nil
 	}
 
 	actualSlice := link.Map(mapFunction).Slice()
 
 	assert.Equal(t, expectedOutput, actualSlice)
+}
+
+func TestMapGeneratesError(t *testing.T) {
+	errorValue := "Do"
+	errorGenerated := errors.New("this is an example error")
+
+	inputSlice := []string{"DogCows", "goes", "Moof!", errorValue, "you", "like", "Clarus", "the", "DogCow?"}
+	var expectedOutput []interface{}
+	for _, stringValue := range inputSlice {
+		expectedOutput = append(expectedOutput, len(stringValue))
+	}
+
+	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
+	link := NewLink(generation)
+
+	mapFunction := func(value interface{}) (interface{}, error) {
+		stringValue := value.(string)
+		if stringValue == errorValue {
+			return 0, errorGenerated
+		}
+
+		return len(stringValue), nil
+	}
+
+	_, err := link.Map(mapFunction).SliceError()
+
+	assert.Equal(t, errorGenerated, err)
 }
 
 func TestFilter(t *testing.T) {

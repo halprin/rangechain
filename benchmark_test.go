@@ -27,18 +27,18 @@ func BenchmarkFlatten1000(b *testing.B) {
 		FromSlice(sliceOfSlice).Flatten().Filter(func(value interface{}) bool {
 			intValue := value.(int)
 			return intValue % 2 == 0
-		}).Map(func(value interface{}) interface{} {
+		}).Map(func(value interface{}) (interface{}, error) {
 			intValue := value.(int)
-			return intValue * 2 + 2
+			return intValue * 2 + 2, nil
 		}).Slice()
 	}
 }
 
 func BenchmarkSleepWithSerialMap(b *testing.B) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSlice(size10Slice).Map(func(value interface{}) interface{} {
+		FromSlice(size10Slice).Map(func(value interface{}) (interface{}, error) {
 			time.Sleep(100 * time.Millisecond)
-			return value
+			return value, nil
 		}).Slice()
 	}
 }
@@ -67,9 +67,9 @@ func benchmarkIntermediate(b *testing.B, inputSlice []int) {
 		FromSlice(inputSlice).Filter(func(value interface{}) bool {
 			intValue := value.(int)
 			return intValue % 2 == 0
-		}).Map(func(value interface{}) interface{} {
+		}).Map(func(value interface{}) (interface{}, error) {
 			intValue := value.(int)
-			return intValue * 2 + 2
+			return intValue * 2 + 2, nil
 		}).Slice()
 	}
 }

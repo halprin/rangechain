@@ -1,5 +1,10 @@
 package intermediate
 
+import (
+	"errors"
+	"github.com/halprin/rangechain/generator"
+)
+
 func (receiver *Link) Slice() []interface{} {
 	endSlice := []interface{}{}
 
@@ -7,6 +12,23 @@ func (receiver *Link) Slice() []interface{} {
 		currentValue, err := receiver.generator()
 		if err != nil {
 			return endSlice
+		}
+
+		endSlice = append(endSlice, currentValue)
+	}
+}
+
+func (receiver *Link) SliceError() ([]interface{}, error) {
+	endSlice := []interface{}{}
+
+	for {
+		currentValue, err := receiver.generator()
+		if err != nil {
+			if errors.Is(err, generator.Exhausted) {
+				return endSlice, nil
+			} else {
+				return nil, err
+			}
 		}
 
 		endSlice = append(endSlice, currentValue)

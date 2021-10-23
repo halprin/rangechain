@@ -6,14 +6,14 @@ import (
 	"sort"
 )
 
-func (receiver *Link) Map(mapFunction func(interface{}) interface{}) *Link {
+func (receiver *Link) Map(mapFunction func(interface{}) (interface{}, error)) *Link {
 	mapGenerator := func() (interface{}, error) {
 		valueToMap, err := receiver.generator()
 		if err != nil {
 			return 0, err
 		}
 
-		return mapFunction(valueToMap), nil
+		return mapFunction(valueToMap)
 	}
 
 	return NewLink(mapGenerator)
