@@ -69,7 +69,7 @@ func TestForEachParallel(t *testing.T) {
 
 	for {
 		seenItemsLock.RLock()
-		if len(seenItems) != len(expectedOutput) {
+		if len(seenItems) == len(expectedOutput) {
 			seenItemsLock.RUnlock()
 			break
 		}
