@@ -33,7 +33,7 @@ func TestMap(t *testing.T) {
 
 func TestMapGeneratesError(t *testing.T) {
 	errorValue := "Do"
-	errorGenerated := errors.New("this is an example error")
+	expectedError := errors.New("this is an example error")
 
 	inputSlice := []string{"DogCows", "goes", "Moof!", errorValue, "you", "like", "Clarus", "the", "DogCow?"}
 	var expectedOutput []interface{}
@@ -47,7 +47,7 @@ func TestMapGeneratesError(t *testing.T) {
 	mapFunction := func(value interface{}) (interface{}, error) {
 		stringValue := value.(string)
 		if stringValue == errorValue {
-			return 0, errorGenerated
+			return 0, expectedError
 		}
 
 		return len(stringValue), nil
@@ -55,7 +55,7 @@ func TestMapGeneratesError(t *testing.T) {
 
 	_, err := link.Map(mapFunction).Slice()
 
-	assert.Equal(t, errorGenerated, err)
+	assert.Equal(t, expectedError, err)
 }
 
 func TestFilter(t *testing.T) {
@@ -272,6 +272,27 @@ func TestSort(t *testing.T) {
 	assert.Nil(err)
 }
 
+func TestSortHasError(t *testing.T) {
+	assert := assert.New(t)
+
+	expectedError := errors.New("this is an example error")
+	errorValue := 9
+	inputSlice    := []int{7, 4, 2, 3, errorValue, 5, 6, 0, 8, 1}
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	returnLessFunction := func(sliceToSort []interface{}) func(int, int) bool {
+		return func(i int, j int) bool {
+			iItem := sliceToSort[i].(int)
+			jItem := sliceToSort[j].(int)
+			return iItem < jItem
+		}
+	}
+	_, err := link.Sort(returnLessFunction).Slice()
+
+	assert.Equal(expectedError, err)
+}
+
 func TestReverse(t *testing.T) {
 	assert := assert.New(t)
 
@@ -286,6 +307,20 @@ func TestReverse(t *testing.T) {
 	assert.Nil(err)
 }
 
+func TestReverseHasError(t *testing.T) {
+	assert := assert.New(t)
+
+	expectedError := errors.New("this is an example error")
+	errorValue := 9
+	inputSlice    := []int{7, 4, 2, 3, errorValue, 5, 6, 0, 8, 1}
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	_, err := link.Reverse().Slice()
+
+	assert.Equal(expectedError, err)
+}
+
 func createTestChannel(intSlice []int) chan interface{} {
 	intChannel := make(chan interface{})
 
@@ -297,4 +332,20 @@ func createTestChannel(intSlice []int) chan interface{} {
 	}()
 
 	return intChannel
+}
+
+func createGeneratorWithError(intSlice []int, valueToErrorOn int, errorToReturn error) func() (interface{}, error) {
+	generation := generator.FromSlice(intSlice)
+
+	return func() (interface{}, error) {
+		value, err := generation()
+
+		if err != nil {
+			return value, err
+		} else if value == valueToErrorOn {
+			return 0, errorToReturn
+		}
+
+		return value, err
+	}
 }

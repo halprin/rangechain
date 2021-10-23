@@ -132,11 +132,18 @@ func (receiver *Link) Flatten() *Link {
 }
 
 func (receiver *Link) Sort(returnLessFunction func([]interface{}) func(int, int) bool) *Link {
-	serializedSlice, _ := receiver.Slice()
+	serializedSlice, err := receiver.Slice()
+	if err != nil {
+		//there was an error during serialization, so no need to do the work of sorting
+		//just always return the error that occurred
+		generation := func() (interface{}, error) {
+			return 0, err
+		}
+		return NewLink(generation)
+	}
 
 	lessFunction := returnLessFunction(serializedSlice)
 	sort.Slice(serializedSlice, lessFunction)
-
 
 	generation := generator.FromSlice(serializedSlice)
 
@@ -144,7 +151,15 @@ func (receiver *Link) Sort(returnLessFunction func([]interface{}) func(int, int)
 }
 
 func (receiver *Link) Reverse() *Link {
-	serializedSlice, _ := receiver.Slice()
+	serializedSlice, err := receiver.Slice()
+	if err != nil {
+		//there was an error during serialization, so no need to do the work of reversing
+		//just always return the error that occurred
+		generation := func() (interface{}, error) {
+			return 0, err
+		}
+		return NewLink(generation)
+	}
 
 	for startIndex, endIndex := 0, len(serializedSlice) - 1; startIndex <= endIndex; startIndex, endIndex = startIndex + 1, endIndex - 1 {
 		serializedSlice[startIndex], serializedSlice[endIndex] = serializedSlice[endIndex], serializedSlice[startIndex]
