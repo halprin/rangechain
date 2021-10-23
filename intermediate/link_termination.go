@@ -5,20 +5,7 @@ import (
 	"github.com/halprin/rangechain/generator"
 )
 
-func (receiver *Link) Slice() []interface{} {
-	endSlice := []interface{}{}
-
-	for {
-		currentValue, err := receiver.generator()
-		if err != nil {
-			return endSlice
-		}
-
-		endSlice = append(endSlice, currentValue)
-	}
-}
-
-func (receiver *Link) SliceError() ([]interface{}, error) {
+func (receiver *Link) Slice() ([]interface{}, error) {
 	endSlice := []interface{}{}
 
 	for {

@@ -10,13 +10,15 @@ import (
 )
 
 func TestSlice(t *testing.T) {
+	assert := assert.New(t)
 	expectedSlice := []int{987, 8, 26}
 	generation := generator.FromSlice(helper.InterfaceSlice(expectedSlice))
 	link := NewLink(generation)
 
-	actualSlice := link.Slice()
+	actualSlice, err := link.Slice()
 
-	assert.Equal(t, helper.InterfaceSlice(expectedSlice), actualSlice)
+	assert.Equal(helper.InterfaceSlice(expectedSlice), actualSlice)
+	assert.Nil(err)
 }
 
 func TestChannel(t *testing.T) {

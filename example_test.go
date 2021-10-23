@@ -9,7 +9,7 @@ func TestFunStuff(t *testing.T) {
 	stringSlice := []string{"DogCows", "goes", "Moof", "Do", "you", "like", "Clarus", "the", "DogCow"}
 	chain := FromSlice(stringSlice)
 
-	outputSlice := chain.
+	outputSlice, _ := chain.
 		Map(func(value interface{}) (interface{}, error) {
 			stringValue := value.(string)
 			return stringValue + " not", nil

@@ -9,6 +9,8 @@ import (
 )
 
 func TestMap(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
 	var expectedOutput []interface{}
 	for _, stringValue := range inputSlice {
@@ -23,9 +25,10 @@ func TestMap(t *testing.T) {
 		return len(stringValue), nil
 	}
 
-	actualSlice := link.Map(mapFunction).Slice()
+	actualSlice, err := link.Map(mapFunction).Slice()
 
-	assert.Equal(t, expectedOutput, actualSlice)
+	assert.Equal(expectedOutput, actualSlice)
+	assert.Nil(err)
 }
 
 func TestMapGeneratesError(t *testing.T) {
@@ -50,12 +53,14 @@ func TestMapGeneratesError(t *testing.T) {
 		return len(stringValue), nil
 	}
 
-	_, err := link.Map(mapFunction).SliceError()
+	_, err := link.Map(mapFunction).Slice()
 
 	assert.Equal(t, errorGenerated, err)
 }
 
 func TestFilter(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
 	expectedSlice := helper.InterfaceSlice([]int{7, 9, 6, 8})
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
@@ -66,98 +71,125 @@ func TestFilter(t *testing.T) {
 		return intValue > 5
 	}
 
-	actualSlice := link.Filter(filterFunction).Slice()
+	actualSlice, err := link.Filter(filterFunction).Slice()
 
-	assert.Equal(t, expectedSlice, actualSlice)
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
 }
 
 func TestSkip(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice    := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
 	howManyToSkip := 3
-	actualSlice := link.Skip(howManyToSkip).Slice()
+	actualSlice, err := link.Skip(howManyToSkip).Slice()
 
-	assert.Equal(t, helper.InterfaceSlice(inputSlice[howManyToSkip:]), actualSlice)
+	assert.Equal(helper.InterfaceSlice(inputSlice[howManyToSkip:]), actualSlice)
+	assert.Nil(err)
 }
 
 func TestSkipLargerThanSlice(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice    := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
-	actualSlice := link.Skip(len(inputSlice) + 1).Slice()
+	actualSlice, err := link.Skip(len(inputSlice) + 1).Slice()
 
-	assert.Equal(t, []interface{}{}, actualSlice)
+	assert.Equal([]interface{}{}, actualSlice)
+	assert.Nil(err)
 }
 
 func TestLimit(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice    := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
 	howManyToKeep := 6
-	actualSlice := link.Limit(howManyToKeep).Slice()
+	actualSlice, err := link.Limit(howManyToKeep).Slice()
 
-	assert.Equal(t, helper.InterfaceSlice(inputSlice[:howManyToKeep]), actualSlice)
+	assert.Equal(helper.InterfaceSlice(inputSlice[:howManyToKeep]), actualSlice)
+	assert.Nil(err)
 }
 
 func TestLimitLargerThanSlice(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice    := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
-	actualSlice := link.Limit(len(inputSlice) + 1).Slice()
+	actualSlice, err := link.Limit(len(inputSlice) + 1).Slice()
 
-	assert.Equal(t, helper.InterfaceSlice(inputSlice), actualSlice)
+	assert.Equal(helper.InterfaceSlice(inputSlice), actualSlice)
+	assert.Nil(err)
 }
 
 func TestDistinct(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{7, 4, 2, 7, 3, 7, 9, 5, 5, 2, 6, 0, 8, 1}
 	expectedSlice := helper.InterfaceSlice([]int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1})
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
-	actualSlice := link.Distinct().Slice()
+	actualSlice, err := link.Distinct().Slice()
 
-	assert.Equal(t, expectedSlice, actualSlice)
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
 }
 
 func TestFlattenWithSliceOfSlice(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
 	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 5, 6, 7, 8, 9})
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
-	actualSlice := link.Flatten().Slice()
+	actualSlice, err := link.Flatten().Slice()
 
-	assert.Equal(t, expectedSlice, actualSlice)
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
 }
 
 func TestFlattenWithSliceMix(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []interface{}{[]int{1, 2, 3}, 4, []int{7, 8, 9}}
 	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 7, 8, 9})
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
-	actualSlice := link.Flatten().Slice()
+	actualSlice, err := link.Flatten().Slice()
 
-	assert.Equal(t, expectedSlice, actualSlice)
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
 }
 
 func TestFlattenWithArray(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []interface{}{[...]int{1, 2, 3}, 4, [...]int{7, 8, 9}}
 	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 7, 8, 9})
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
-	actualSlice := link.Flatten().Slice()
+	actualSlice, err := link.Flatten().Slice()
 
-	assert.Equal(t, expectedSlice, actualSlice)
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
 }
 
 func TestFlattenWithChannel(t *testing.T) {
+	assert := assert.New(t)
+
 	firstChannel := createTestChannel([]int{1, 2, 3})
 	secondChannel := createTestChannel([]int{7, 8, 9})
 
@@ -166,9 +198,10 @@ func TestFlattenWithChannel(t *testing.T) {
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
-	actualSlice := link.Flatten().Slice()
+	actualSlice, err := link.Flatten().Slice()
 
-	assert.Equal(t, expectedSlice, actualSlice)
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
 }
 
 func TestFlattenWithSliceAndMap(t *testing.T) {
@@ -204,10 +237,11 @@ func TestFlattenWithSliceAndMap(t *testing.T) {
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
-	actualSlice := link.Flatten().Slice()
+	actualSlice, err := link.Flatten().Slice()
 
 	//not testing the order of the entire expected slice because we are not guaranteed the order in which a map is iterated over
 	assert.ElementsMatch(expectedSlice, actualSlice)
+	assert.Nil(err)
 	//test the order for the non-map flattened parts
 	assert.Equal(expectedSlice[0], actualSlice[0])
 	assert.Equal(expectedSlice[1], actualSlice[1])
@@ -218,6 +252,8 @@ func TestFlattenWithSliceAndMap(t *testing.T) {
 }
 
 func TestSort(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice    := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
 	expectedSlice := helper.InterfaceSlice([]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
@@ -230,20 +266,24 @@ func TestSort(t *testing.T) {
 			return iItem < jItem
 		}
 	}
-	actualSlice := link.Sort(returnLessFunction).Slice()
+	actualSlice, err := link.Sort(returnLessFunction).Slice()
 
-	assert.Equal(t, expectedSlice, actualSlice)
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
 }
 
 func TestReverse(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice    := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
 	expectedSlice := helper.InterfaceSlice([]int{1, 8, 0, 6, 5, 9, 3, 2, 4, 7})
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
 	link := NewLink(generation)
 
-	actualSlice := link.Reverse().Slice()
+	actualSlice, err := link.Reverse().Slice()
 
-	assert.Equal(t, expectedSlice, actualSlice)
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
 }
 
 func createTestChannel(intSlice []int) chan interface{} {

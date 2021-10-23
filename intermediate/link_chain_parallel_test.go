@@ -8,6 +8,8 @@ import (
 )
 
 func TestMapParallel(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
 	var expectedOutput []interface{}
 	for _, stringValue := range inputSlice {
@@ -22,12 +24,15 @@ func TestMapParallel(t *testing.T) {
 		return len(stringValue)
 	}
 
-	actualSlice := link.MapParallel(mapFunction).Slice()
+	actualSlice, err := link.MapParallel(mapFunction).Slice()
 
-	assert.Equal(t, expectedOutput, actualSlice)
+	assert.Equal(expectedOutput, actualSlice)
+	assert.Nil(err)
 }
 
 func TestFilterParallel(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
 	expectedSlice := helper.InterfaceSlice([]int{7, 9, 6, 8})
 	generation := generator.FromSlice(helper.InterfaceSlice(inputSlice))
@@ -38,7 +43,8 @@ func TestFilterParallel(t *testing.T) {
 		return intValue > 5
 	}
 
-	actualSlice := link.FilterParallel(filterFunction).Slice()
+	actualSlice, err := link.FilterParallel(filterFunction).Slice()
 
-	assert.Equal(t, expectedSlice, actualSlice)
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
 }
