@@ -24,9 +24,9 @@ func BenchmarkIntermediate1000(b *testing.B) {
 
 func BenchmarkFlatten1000(b *testing.B) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSlice(sliceOfSlice).Flatten().Filter(func(value interface{}) bool {
+		FromSlice(sliceOfSlice).Flatten().Filter(func(value interface{}) (bool, error) {
 			intValue := value.(int)
-			return intValue % 2 == 0
+			return intValue % 2 == 0, nil
 		}).Map(func(value interface{}) (interface{}, error) {
 			intValue := value.(int)
 			return intValue * 2 + 2, nil
@@ -64,9 +64,9 @@ func makeIntSliceOfSize(size int) []int {
 
 func benchmarkIntermediate(b *testing.B, inputSlice []int) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSlice(inputSlice).Filter(func(value interface{}) bool {
+		FromSlice(inputSlice).Filter(func(value interface{}) (bool, error) {
 			intValue := value.(int)
-			return intValue % 2 == 0
+			return intValue % 2 == 0, nil
 		}).Map(func(value interface{}) (interface{}, error) {
 			intValue := value.(int)
 			return intValue * 2 + 2, nil

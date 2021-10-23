@@ -14,10 +14,10 @@ func TestFunStuff(t *testing.T) {
 			stringValue := value.(string)
 			return stringValue + " not", nil
 		}).
-		Filter(func(value interface{}) bool {
+		Filter(func(value interface{}) (bool, error) {
 			stringValue := value.(string)
 
-			return len(stringValue) % 2 == 0
+			return len(stringValue) % 2 == 0, nil
 		}).
 
 		Skip(1).

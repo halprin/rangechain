@@ -19,7 +19,7 @@ func (receiver *Link) Map(mapFunction func(interface{}) (interface{}, error)) *L
 	return NewLink(mapGenerator)
 }
 
-func (receiver *Link) Filter(filterFunction func(interface{}) bool) *Link {
+func (receiver *Link) Filter(filterFunction func(interface{}) (bool, error)) *Link {
 	filterGenerator := func() (interface{}, error) {
 		//go through the generator until you find an item that stays
 		for {
@@ -28,7 +28,11 @@ func (receiver *Link) Filter(filterFunction func(interface{}) bool) *Link {
 				return 0, err
 			}
 
-			if filterFunction(valueToFilter) {
+			valueStays, err := filterFunction(valueToFilter)
+
+			if err != nil {
+				return valueToFilter, err
+			} else if valueStays {
 				return valueToFilter, nil
 			}
 		}
