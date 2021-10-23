@@ -22,14 +22,23 @@ func (receiver *Link) Slice() ([]interface{}, error) {
 	}
 }
 
-func (receiver *Link) Channel() <-chan interface{} {
+func (receiver *Link) Channel() (<-chan interface{}, <-chan error) {
 	endChannel := make(chan interface{})
+	errorChannel := make(chan error)
 
 	go func() {
 		for {
 			currentValue, err := receiver.generator()
 			if err != nil {
+				//close the end channel no matter what
+				//if this is due to a user error (and not Exhausted), I also want to close the endChannel first before writing to the error channel
 				close(endChannel)
+
+				if !errors.Is(err, generator.Exhausted) {
+					errorChannel <- err
+				}
+				close(errorChannel)
+
 				return
 			}
 
@@ -37,7 +46,7 @@ func (receiver *Link) Channel() <-chan interface{} {
 		}
 	}()
 
-	return endChannel
+	return endChannel, errorChannel
 }
 
 func (receiver *Link) ForEach(forEachFunction func(interface{})) {

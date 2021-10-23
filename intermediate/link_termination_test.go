@@ -2,6 +2,7 @@ package intermediate
 
 
 import (
+	"errors"
 	"github.com/halprin/rangechain/generator"
 	"github.com/halprin/rangechain/helper"
 	"github.com/stretchr/testify/assert"
@@ -22,16 +23,41 @@ func TestSlice(t *testing.T) {
 }
 
 func TestChannel(t *testing.T) {
+	assert := assert.New(t)
+
 	expectedSlice := []int{987, 8, 26}
 	generation := generator.FromSlice(expectedSlice)
 	link := NewLink(generation)
 
 	var seenItems []interface{}
-	for currentValue := range link.Channel() {
+	valueChannel, errorChannel := link.Channel()
+	for currentValue := range valueChannel {
 		seenItems = append(seenItems, currentValue)
 	}
+	seenError := <-errorChannel
 
-	assert.Equal(t, helper.InterfaceSlice(expectedSlice), seenItems)
+	assert.Equal(helper.InterfaceSlice(expectedSlice), seenItems)
+	assert.Nil(seenError)
+}
+
+func TestChannelHasError(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 8
+	inputSlice := []int{987, errorValue, 26}
+	expectedError := errors.New("an example error yo")
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	var seenItems []interface{}
+	valueChannel, errorChannel := link.Channel()
+	//still range through the value channel to ensure we close the channel when an error is encountered
+	for currentValue := range valueChannel {
+		seenItems = append(seenItems, currentValue)
+	}
+	seenError := <-errorChannel
+
+	assert.Equal(expectedError, seenError)
 }
 
 func TestForEach(t *testing.T) {
