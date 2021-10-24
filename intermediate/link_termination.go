@@ -171,15 +171,23 @@ func (receiver *Link) NoneMatch(noneMatchFunction func(interface{}) (bool, error
 	return !match, err
 }
 
-func (receiver *Link) Reduce(reduceFunction func(interface{}, interface{}) interface{}) *interface{} {
+func (receiver *Link) Reduce(reduceFunction func(interface{}, interface{}) interface{}) (*interface{}, error) {
 	nextItem, err := receiver.generator()
 	if err != nil {
-		return nil
+		if errors.Is(err, generator.Exhausted) {
+			return nil, nil
+		} else if !errors.Is(err, generator.Exhausted) {
+			return nil, err
+		}
 	}
 
 	intermediateItem, err := receiver.generator()
 	if err != nil {
-		return &nextItem
+		if errors.Is(err, generator.Exhausted) {
+			return &nextItem, nil
+		} else if !errors.Is(err, generator.Exhausted) {
+			return &nextItem, err
+		}
 	}
 
 	for err == nil {
@@ -187,7 +195,12 @@ func (receiver *Link) Reduce(reduceFunction func(interface{}, interface{}) inter
 		nextItem, err = receiver.generator()
 	}
 
-	return &intermediateItem
+	if errors.Is(err, generator.Exhausted) {
+		//if the error that stopped the for loop, don't report it as an error
+		err = nil
+	}
+
+	return &intermediateItem, err
 }
 
 func (receiver *Link) ReduceWithInitialValue(reduceFunction func(interface{}, interface{}) interface{}, initialValue interface{}) interface{} {

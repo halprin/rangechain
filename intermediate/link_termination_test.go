@@ -541,10 +541,11 @@ func TestReduce(t *testing.T) {
 
 		return firstIntItem * secondIntItem
 	}
-	actualReducedValue := link.Reduce(reduceFunction)
+	actualReducedValue, err := link.Reduce(reduceFunction)
 
 	assert.NotNil(actualReducedValue)
 	assert.Equal(expectedValue, *actualReducedValue)
+	assert.Nil(err)
 }
 
 func TestReduceWithOneItem(t *testing.T) {
@@ -560,13 +561,16 @@ func TestReduceWithOneItem(t *testing.T) {
 
 		return firstIntItem * secondIntItem
 	}
-	actualReducedValue := link.Reduce(reduceFunction)
+	actualReducedValue, err := link.Reduce(reduceFunction)
 
 	assert.NotNil(actualReducedValue)
 	assert.Equal(inputSlice[0], *actualReducedValue)
+	assert.Nil(err)
 }
 
 func TestReduceWithZeroItems(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{}
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
@@ -577,9 +581,10 @@ func TestReduceWithZeroItems(t *testing.T) {
 
 		return firstIntItem * secondIntItem
 	}
-	actualReducedValue := link.Reduce(reduceFunction)
+	actualReducedValue, err := link.Reduce(reduceFunction)
 
-	assert.Nil(t, actualReducedValue)
+	assert.Nil(actualReducedValue)
+	assert.Nil(err)
 }
 
 func TestReduceWithInitialValue(t *testing.T) {
