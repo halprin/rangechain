@@ -67,6 +67,17 @@ on any changes performed by the previous chain method.
 Because modifications are lazily computed, none of the modifications from chaining methods are applied until _after_ a
 terminating method is called.
 
+| Method | Arguments | Description |
+| --- | --- | --- |
+| `Map` | • `mapFunction` - A function that takes a single argument and returns a value and an optional error. | Will run the function across all the values in the chain.  Return what you want to change the value into and an optional error if an error is encountered. |
+| `Filter` | • `filterFunction` - A function that takes a single argument and returns a boolean and an optional error. | Will run the function across all the values in the chain.  On return of true, the value will stay; on false, the value will be removed. |
+| `Skip` |  |  |
+| `Limit` |  |  |
+| `Distinct` |  |  |
+| `Flatten` |  |  |
+| `Sort` |  |  |
+| `Reverse` |  |  |
+
 ### Terminating the Chain
 
 Terminating methods also apply some modification, requests some information, or executes something on the elements.
