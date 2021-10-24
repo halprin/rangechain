@@ -33,8 +33,44 @@ chain := rangechain.FromSlice(container)
 | `FromChannel` | • `channel` - A channel to be used to start the chain. | Starts the chain with the supplied channel.  Chaining and terminating methods can now be called on the result. |
 | `FromMap` | • `aMap` - A map to be used to start the chain. | Starts the chain with the supplied map.  Chaining and terminating methods can now be called on the result.  The singular value used to represent the key and value pairs is `generator.MapTuple` of `github.com/halprin/rangechain/generator`. |
 
+From there, one can call a plethora of additional methods to modify the container passed in originally.  The methods are
+outlined below.  The methods fall into one of two categories: chaining or terminating.
+
+#### Value Types
+
+Because Go does not support generics (yet), this library operates using `interface{}`.  One using this library may need
+to use type assertions.
+
+For example, something like `actualValue := value.(int)`.
+
+For another example...
+
+```go
+stringSlice := []string{"DogCows", "goes", "Moof", "Do", "you", "like", "Clarus", "the", "DogCow"}
+chain := FromSlice(stringSlice)
+
+outputSlice, _ := chain.
+    Map(func(value interface{}) (interface{}, error) {
+        stringValue := value.(string)
+        return stringValue + " not", nil
+    }).Slice()
+```
+
+Notice `stringValue := value.(string)` above.  This allows one to do the string concatenation on the next line because
+the `+` operator doesn't work on an `interface{}` type.
+
 ### Continuing the Chain
 
+Chaining methods apply some modification to the values in the container values, but keeps the chain alive.
+This allows additional chaining methods to be subsequently called on the result.  The subsequent chain methods operate
+on any changes performed by the previous chain method.
+Because modifications are lazily computed, none of the modifications from chaining methods are applied until _after_ a
+terminating method is called.
+
 ### Terminating the Chain
+
+Terminating methods also apply some modification, requests some information, or executes something on the elements.
+They stop the chaining by returning an actual value.  This value will depend on all the previous chaining methods being
+executed first.
 
 ## Examples
