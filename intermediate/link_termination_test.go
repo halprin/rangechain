@@ -344,6 +344,8 @@ func TestAllMatchWithErrorInMatchFunction(t *testing.T) {
 }
 
 func TestAnyMatch(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{985, 3, 26}
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
@@ -352,12 +354,15 @@ func TestAnyMatch(t *testing.T) {
 		intValue := value.(int)
 		return intValue % 2 == 0  //even means true
 	}
-	match := link.AnyMatch(anyMatchFunction)
+	match, err := link.AnyMatch(anyMatchFunction)
 
-	assert.True(t, match)
+	assert.True(match)
+	assert.Nil(err)
 }
 
 func TestNotAnyMatch(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{985, 7, 29}
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
@@ -366,12 +371,15 @@ func TestNotAnyMatch(t *testing.T) {
 		intValue := value.(int)
 		return intValue % 2 == 0  //even means true
 	}
-	match := link.AnyMatch(anyMatchFunction)
+	match, err := link.AnyMatch(anyMatchFunction)
 
-	assert.False(t, match)
+	assert.False(match)
+	assert.Nil(err)
 }
 
 func TestAnyMatchWithEmptySlice(t *testing.T) {
+	assert := assert.New(t)
+
 	var inputSlice []int
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
@@ -380,9 +388,29 @@ func TestAnyMatchWithEmptySlice(t *testing.T) {
 		intValue := value.(int)
 		return intValue % 2 == 0  //even means true
 	}
-	match := link.AnyMatch(anyMatchFunction)
+	match, err := link.AnyMatch(anyMatchFunction)
 
-	assert.False(t, match)
+	assert.False(match)
+	assert.Nil(err)
+}
+
+func TestAnyMatchWithEarlierError(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 26
+	inputSlice := []int{985, 3, errorValue}
+	expectedError := errors.New("an example error yo")
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	anyMatchFunction := func(value interface{}) bool {
+		intValue := value.(int)
+		return intValue % 2 == 0  //even means true
+	}
+	match, err := link.AnyMatch(anyMatchFunction)
+
+	assert.False(match)
+	assert.Equal(expectedError, err)
 }
 
 func TestNoneMatch(t *testing.T) {

@@ -144,21 +144,28 @@ func (receiver *Link) AllMatch(allMatchFunction func(interface{}) (bool, error))
 	}
 }
 
-func (receiver *Link) AnyMatch(anyMatchFunction func(interface{}) bool) bool {
+func (receiver *Link) AnyMatch(anyMatchFunction func(interface{}) bool) (bool, error) {
 	for {
 		currentValue, err := receiver.generator()
 		if err != nil {
-			return false
+			if errors.Is(err, generator.Exhausted) {
+				//we've reached the end and apparently never returned until now, so nothing matched
+				return false, nil
+			} else if !errors.Is(err, generator.Exhausted) {
+				//we've reached an error, and never returned earlier, so nothing matched
+				return false, err
+			}
 		}
 
 		if anyMatchFunction(currentValue) {
-			return true
+			return true, nil
 		}
 	}
 }
 
 func (receiver *Link) NoneMatch(noneMatchFunction func(interface{}) bool) bool {
-	return !receiver.AnyMatch(noneMatchFunction)
+	match, _ := receiver.AnyMatch(noneMatchFunction)
+	return !match
 }
 
 func (receiver *Link) Reduce(reduceFunction func(interface{}, interface{}) interface{}) *interface{} {
