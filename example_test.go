@@ -30,7 +30,7 @@ func TestReduceToMapExample(t *testing.T) {
 	stringSlice := []string{"DogCows", "goes", "Moof", "Do", "you", "like", "Clarus", "the", "DogCow"}
 	chain := FromSlice(stringSlice)
 
-	outputMap := chain.
+	outputMap, _ := chain.
 		ReduceWithInitialValue(func(firstItem interface{}, secondItem interface{}) interface{} {
 			reductionMap := firstItem.(map[string]int)
 			stringItem := secondItem.(string)

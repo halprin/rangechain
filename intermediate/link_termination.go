@@ -207,10 +207,14 @@ func (receiver *Link) Reduce(reduceFunction func(interface{}, interface{}) (inte
 	return &intermediateItem, err
 }
 
-func (receiver *Link) ReduceWithInitialValue(reduceFunction func(interface{}, interface{}) interface{}, initialValue interface{}) interface{} {
+func (receiver *Link) ReduceWithInitialValue(reduceFunction func(interface{}, interface{}) interface{}, initialValue interface{}) (interface{}, error) {
 	nextItem, err := receiver.generator()
 	if err != nil {
-		return initialValue
+		if errors.Is(err, generator.Exhausted) {
+			return initialValue, nil
+		} else if !errors.Is(err, generator.Exhausted) {
+			return initialValue, err
+		}
 	}
 
 	intermediateItem := initialValue
@@ -220,5 +224,10 @@ func (receiver *Link) ReduceWithInitialValue(reduceFunction func(interface{}, in
 		nextItem, err = receiver.generator()
 	}
 
-	return intermediateItem
+	if errors.Is(err, generator.Exhausted) {
+		//if the error that stopped the for loop, don't report it as an error
+		err = nil
+	}
+
+	return intermediateItem, err
 }

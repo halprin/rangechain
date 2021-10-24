@@ -631,6 +631,8 @@ func TestReduceWithErrorInReduceFunction(t *testing.T) {
 }
 
 func TestReduceWithInitialValue(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{987, 8, 26}
 	inputInitialValue := 4
 	expectedValue := inputInitialValue * inputSlice[0] * inputSlice[1] * inputSlice[2]
@@ -643,12 +645,15 @@ func TestReduceWithInitialValue(t *testing.T) {
 
 		return firstIntItem * secondIntItem
 	}
-	actualReducedValue := link.ReduceWithInitialValue(reduceFunction, inputInitialValue)
+	actualReducedValue, err := link.ReduceWithInitialValue(reduceFunction, inputInitialValue)
 
-	assert.Equal(t, expectedValue, actualReducedValue)
+	assert.Equal(expectedValue, actualReducedValue)
+	assert.Nil(err)
 }
 
 func TestReduceWithInitialValueWithOneItem(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{987}
 	inputInitialValue := 4
 	generation := generator.FromSlice(inputSlice)
@@ -660,12 +665,15 @@ func TestReduceWithInitialValueWithOneItem(t *testing.T) {
 
 		return firstIntItem * secondIntItem
 	}
-	actualReducedValue := link.ReduceWithInitialValue(reduceFunction, inputInitialValue)
+	actualReducedValue, err := link.ReduceWithInitialValue(reduceFunction, inputInitialValue)
 
-	assert.Equal(t, inputInitialValue * inputSlice[0], actualReducedValue)
+	assert.Equal(inputInitialValue * inputSlice[0], actualReducedValue)
+	assert.Nil(err)
 }
 
 func TestReduceWithInitialValueWithZeroItems(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{}
 	inputInitialValue := 4
 	generation := generator.FromSlice(inputSlice)
@@ -677,7 +685,28 @@ func TestReduceWithInitialValueWithZeroItems(t *testing.T) {
 
 		return firstIntItem * secondIntItem
 	}
-	actualReducedValue := link.ReduceWithInitialValue(reduceFunction, inputInitialValue)
+	actualReducedValue, err := link.ReduceWithInitialValue(reduceFunction, inputInitialValue)
 
-	assert.Equal(t, inputInitialValue, actualReducedValue)
+	assert.Equal(inputInitialValue, actualReducedValue)
+	assert.Nil(err)
+}
+
+func TestReduceWithInitialValueWithEarlierError(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 8
+	inputSlice := []int{987, errorValue, 26}
+	expectedError := errors.New("an example error yo")
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
+		firstIntItem := firstItem.(int)
+		secondIntItem := secondItem.(int)
+
+		return firstIntItem * secondIntItem
+	}
+	_, err := link.ReduceWithInitialValue(reduceFunction, 4)
+
+	assert.Equal(expectedError, err)
 }
