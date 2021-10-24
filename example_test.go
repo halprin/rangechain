@@ -9,15 +9,15 @@ func TestFunStuff(t *testing.T) {
 	stringSlice := []string{"DogCows", "goes", "Moof", "Do", "you", "like", "Clarus", "the", "DogCow"}
 	chain := FromSlice(stringSlice)
 
-	outputSlice := chain.
-		Map(func(value interface{}) interface{} {
+	outputSlice, _ := chain.
+		Map(func(value interface{}) (interface{}, error) {
 			stringValue := value.(string)
-			return stringValue + " not"
+			return stringValue + " not", nil
 		}).
-		Filter(func(value interface{}) bool {
+		Filter(func(value interface{}) (bool, error) {
 			stringValue := value.(string)
 
-			return len(stringValue) % 2 == 0
+			return len(stringValue) % 2 == 0, nil
 		}).
 
 		Skip(1).
@@ -30,14 +30,14 @@ func TestReduceToMapExample(t *testing.T) {
 	stringSlice := []string{"DogCows", "goes", "Moof", "Do", "you", "like", "Clarus", "the", "DogCow"}
 	chain := FromSlice(stringSlice)
 
-	outputMap := chain.
-		ReduceWithInitialValue(func(firstItem interface{}, secondItem interface{}) interface{} {
+	outputMap, _ := chain.
+		ReduceWithInitialValue(func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 			reductionMap := firstItem.(map[string]int)
 			stringItem := secondItem.(string)
 
 			reductionMap[stringItem] = len(stringItem)
 
-			return reductionMap
+			return reductionMap, nil
 		}, map[string]int{})
 
 	fmt.Println(outputMap)

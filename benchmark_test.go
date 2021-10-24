@@ -24,30 +24,30 @@ func BenchmarkIntermediate1000(b *testing.B) {
 
 func BenchmarkFlatten1000(b *testing.B) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSlice(sliceOfSlice).Flatten().Filter(func(value interface{}) bool {
+		FromSlice(sliceOfSlice).Flatten().Filter(func(value interface{}) (bool, error) {
 			intValue := value.(int)
-			return intValue % 2 == 0
-		}).Map(func(value interface{}) interface{} {
+			return intValue % 2 == 0, nil
+		}).Map(func(value interface{}) (interface{}, error) {
 			intValue := value.(int)
-			return intValue * 2 + 2
+			return intValue * 2 + 2, nil
 		}).Slice()
 	}
 }
 
 func BenchmarkSleepWithSerialMap(b *testing.B) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSlice(size10Slice).Map(func(value interface{}) interface{} {
+		FromSlice(size10Slice).Map(func(value interface{}) (interface{}, error) {
 			time.Sleep(100 * time.Millisecond)
-			return value
+			return value, nil
 		}).Slice()
 	}
 }
 
 func BenchmarkSleepWithParallelMap(b *testing.B) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSlice(size10Slice).MapParallel(func(value interface{}) interface{} {
+		FromSlice(size10Slice).MapParallel(func(value interface{}) (interface{}, error) {
 			time.Sleep(100 * time.Millisecond)
-			return value
+			return value, nil
 		}).Slice()
 	}
 }
@@ -64,12 +64,12 @@ func makeIntSliceOfSize(size int) []int {
 
 func benchmarkIntermediate(b *testing.B, inputSlice []int) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSlice(inputSlice).Filter(func(value interface{}) bool {
+		FromSlice(inputSlice).Filter(func(value interface{}) (bool, error) {
 			intValue := value.(int)
-			return intValue % 2 == 0
-		}).Map(func(value interface{}) interface{} {
+			return intValue % 2 == 0, nil
+		}).Map(func(value interface{}) (interface{}, error) {
 			intValue := value.(int)
-			return intValue * 2 + 2
+			return intValue * 2 + 2, nil
 		}).Slice()
 	}
 }

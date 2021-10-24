@@ -1,25 +1,26 @@
 package intermediate
 
 import (
+	"errors"
 	"github.com/halprin/rangechain/generator"
 	"github.com/halprin/rangechain/helper"
 	"sort"
 )
 
-func (receiver *Link) Map(mapFunction func(interface{}) interface{}) *Link {
+func (receiver *Link) Map(mapFunction func(interface{}) (interface{}, error)) *Link {
 	mapGenerator := func() (interface{}, error) {
 		valueToMap, err := receiver.generator()
 		if err != nil {
 			return 0, err
 		}
 
-		return mapFunction(valueToMap), nil
+		return mapFunction(valueToMap)
 	}
 
 	return NewLink(mapGenerator)
 }
 
-func (receiver *Link) Filter(filterFunction func(interface{}) bool) *Link {
+func (receiver *Link) Filter(filterFunction func(interface{}) (bool, error)) *Link {
 	filterGenerator := func() (interface{}, error) {
 		//go through the generator until you find an item that stays
 		for {
@@ -28,7 +29,11 @@ func (receiver *Link) Filter(filterFunction func(interface{}) bool) *Link {
 				return 0, err
 			}
 
-			if filterFunction(valueToFilter) {
+			valueStays, err := filterFunction(valueToFilter)
+
+			if err != nil {
+				return valueToFilter, err
+			} else if valueStays {
 				return valueToFilter, nil
 			}
 		}
@@ -118,7 +123,7 @@ func (receiver *Link) Flatten() *Link {
 			}
 
 			innerValue, err = currentGenerator()
-			if err != nil {
+			if errors.Is(err, generator.Exhausted) {
 				//the current generator is exhausted, set it to nil so we grab the next generator
 				innerValue = nil
 				currentGenerator = nil
@@ -132,11 +137,18 @@ func (receiver *Link) Flatten() *Link {
 }
 
 func (receiver *Link) Sort(returnLessFunction func([]interface{}) func(int, int) bool) *Link {
-	serializedSlice := receiver.Slice()
+	serializedSlice, err := receiver.Slice()
+	if err != nil {
+		//there was an error during serialization, so no need to do the work of sorting
+		//just always return the error that occurred
+		generation := func() (interface{}, error) {
+			return 0, err
+		}
+		return NewLink(generation)
+	}
 
 	lessFunction := returnLessFunction(serializedSlice)
 	sort.Slice(serializedSlice, lessFunction)
-
 
 	generation := generator.FromSlice(serializedSlice)
 
@@ -144,7 +156,15 @@ func (receiver *Link) Sort(returnLessFunction func([]interface{}) func(int, int)
 }
 
 func (receiver *Link) Reverse() *Link {
-	serializedSlice := receiver.Slice()
+	serializedSlice, err := receiver.Slice()
+	if err != nil {
+		//there was an error during serialization, so no need to do the work of reversing
+		//just always return the error that occurred
+		generation := func() (interface{}, error) {
+			return 0, err
+		}
+		return NewLink(generation)
+	}
 
 	for startIndex, endIndex := 0, len(serializedSlice) - 1; startIndex <= endIndex; startIndex, endIndex = startIndex + 1, endIndex - 1 {
 		serializedSlice[startIndex], serializedSlice[endIndex] = serializedSlice[endIndex], serializedSlice[startIndex]
