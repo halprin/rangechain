@@ -350,9 +350,9 @@ func TestAnyMatch(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	anyMatchFunction := func(value interface{}) bool {
+	anyMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
-		return intValue % 2 == 0  //even means true
+		return intValue % 2 == 0, nil  //even means true
 	}
 	match, err := link.AnyMatch(anyMatchFunction)
 
@@ -367,9 +367,9 @@ func TestNotAnyMatch(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	anyMatchFunction := func(value interface{}) bool {
+	anyMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
-		return intValue % 2 == 0  //even means true
+		return intValue % 2 == 0, nil  //even means true
 	}
 	match, err := link.AnyMatch(anyMatchFunction)
 
@@ -384,9 +384,9 @@ func TestAnyMatchWithEmptySlice(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	anyMatchFunction := func(value interface{}) bool {
+	anyMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
-		return intValue % 2 == 0  //even means true
+		return intValue % 2 == 0, nil  //even means true
 	}
 	match, err := link.AnyMatch(anyMatchFunction)
 
@@ -403,9 +403,31 @@ func TestAnyMatchWithEarlierError(t *testing.T) {
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
 	link := NewLink(generation)
 
-	anyMatchFunction := func(value interface{}) bool {
+	anyMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
-		return intValue % 2 == 0  //even means true
+		return intValue % 2 == 0, nil  //even means true
+	}
+	match, err := link.AnyMatch(anyMatchFunction)
+
+	assert.False(match)
+	assert.Equal(expectedError, err)
+}
+
+func TestAnyMatchWithErrorInMatchFunction(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 26
+	inputSlice := []int{985, 3, errorValue}
+	expectedError := errors.New("an example error yo")
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	anyMatchFunction := func(value interface{}) (bool, error) {
+		intValue := value.(int)
+		if intValue == errorValue {
+			return true, expectedError
+		}
+		return intValue % 2 == 0, nil  //even means true
 	}
 	match, err := link.AnyMatch(anyMatchFunction)
 
@@ -418,9 +440,9 @@ func TestNoneMatch(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	noneMatchFunction := func(value interface{}) bool {
+	noneMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
-		return intValue % 2 == 0  //even means true
+		return intValue % 2 == 0, nil  //even means true
 	}
 	match := link.NoneMatch(noneMatchFunction)
 
@@ -432,9 +454,9 @@ func TestNotNoneMatch(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	noneMatchFunction := func(value interface{}) bool {
+	noneMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
-		return intValue % 2 == 0  //even means true
+		return intValue % 2 == 0, nil  //even means true
 	}
 	match := link.NoneMatch(noneMatchFunction)
 
@@ -446,9 +468,9 @@ func TestNoneMatchWithEmptySlice(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	noneMatchFunction := func(value interface{}) bool {
+	noneMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
-		return intValue % 2 == 0  //even means true
+		return intValue % 2 == 0, nil  //even means true
 	}
 	match := link.NoneMatch(noneMatchFunction)
 

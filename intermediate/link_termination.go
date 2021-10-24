@@ -144,7 +144,7 @@ func (receiver *Link) AllMatch(allMatchFunction func(interface{}) (bool, error))
 	}
 }
 
-func (receiver *Link) AnyMatch(anyMatchFunction func(interface{}) bool) (bool, error) {
+func (receiver *Link) AnyMatch(anyMatchFunction func(interface{}) (bool, error)) (bool, error) {
 	for {
 		currentValue, err := receiver.generator()
 		if err != nil {
@@ -157,13 +157,16 @@ func (receiver *Link) AnyMatch(anyMatchFunction func(interface{}) bool) (bool, e
 			}
 		}
 
-		if anyMatchFunction(currentValue) {
+		match, err := anyMatchFunction(currentValue)
+		if err != nil {
+			return false, err
+		} else if match {
 			return true, nil
 		}
 	}
 }
 
-func (receiver *Link) NoneMatch(noneMatchFunction func(interface{}) bool) bool {
+func (receiver *Link) NoneMatch(noneMatchFunction func(interface{}) (bool, error)) bool {
 	match, _ := receiver.AnyMatch(noneMatchFunction)
 	return !match
 }
