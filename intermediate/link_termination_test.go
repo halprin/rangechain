@@ -252,6 +252,8 @@ func TestLastHasError(t *testing.T) {
 }
 
 func TestAllMatch(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{984, 8, 26}
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
@@ -260,12 +262,15 @@ func TestAllMatch(t *testing.T) {
 		intValue := value.(int)
 		return intValue % 2 == 0  //even means true
 	}
-	match := link.AllMatch(allMatchFunction)
+	match, err := link.AllMatch(allMatchFunction)
 
-	assert.True(t, match)
+	assert.True(match)
+	assert.Nil(err)
 }
 
 func TestNotAllMatch(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{984, 7, 26}
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
@@ -274,12 +279,15 @@ func TestNotAllMatch(t *testing.T) {
 		intValue := value.(int)
 		return intValue % 2 == 0  //even means true
 	}
-	match := link.AllMatch(allMatchFunction)
+	match, err := link.AllMatch(allMatchFunction)
 
-	assert.False(t, match)
+	assert.False(match)
+	assert.Nil(err)
 }
 
 func TestAllMatchWithEmptySlice(t *testing.T) {
+	assert := assert.New(t)
+
 	var inputSlice []int
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
@@ -288,9 +296,29 @@ func TestAllMatchWithEmptySlice(t *testing.T) {
 		intValue := value.(int)
 		return intValue % 2 == 0  //even means true
 	}
-	match := link.AllMatch(allMatchFunction)
+	match, err := link.AllMatch(allMatchFunction)
 
-	assert.True(t, match)
+	assert.True(match)
+	assert.Nil(err)
+}
+
+func TestAllMatchWithEarlierError(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 984
+	inputSlice := []int{errorValue, 8, 26}
+	expectedError := errors.New("an example error yo")
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	allMatchFunction := func(value interface{}) bool {
+		intValue := value.(int)
+		return intValue % 2 == 0  //even means true
+	}
+	match, err := link.AllMatch(allMatchFunction)
+
+	assert.False(match)
+	assert.Equal(expectedError, err)
 }
 
 func TestAnyMatch(t *testing.T) {

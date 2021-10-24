@@ -124,15 +124,19 @@ func (receiver *Link) Last() (*interface{}, error) {
 	}
 }
 
-func (receiver *Link) AllMatch(allMatchFunction func(interface{}) bool) bool {
+func (receiver *Link) AllMatch(allMatchFunction func(interface{}) bool) (bool, error) {
 	for {
 		currentValue, err := receiver.generator()
 		if err != nil {
-			return true
+			if errors.Is(err, generator.Exhausted) {
+				return true, nil
+			} else if !errors.Is(err, generator.Exhausted) {
+				return false, err
+			}
 		}
 
 		if !allMatchFunction(currentValue) {
-			return false
+			return false, nil
 		}
 	}
 }
