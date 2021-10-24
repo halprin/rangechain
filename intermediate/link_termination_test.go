@@ -535,11 +535,11 @@ func TestReduce(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
 		secondIntItem := secondItem.(int)
 
-		return firstIntItem * secondIntItem
+		return firstIntItem * secondIntItem, nil
 	}
 	actualReducedValue, err := link.Reduce(reduceFunction)
 
@@ -555,11 +555,11 @@ func TestReduceWithOneItem(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
 		secondIntItem := secondItem.(int)
 
-		return firstIntItem * secondIntItem
+		return firstIntItem * secondIntItem, nil
 	}
 	actualReducedValue, err := link.Reduce(reduceFunction)
 
@@ -575,11 +575,11 @@ func TestReduceWithZeroItems(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
 		secondIntItem := secondItem.(int)
 
-		return firstIntItem * secondIntItem
+		return firstIntItem * secondIntItem, nil
 	}
 	actualReducedValue, err := link.Reduce(reduceFunction)
 
@@ -596,11 +596,34 @@ func TestReduceWithEarlierError(t *testing.T) {
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
 	link := NewLink(generation)
 
-	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
 		secondIntItem := secondItem.(int)
 
-		return firstIntItem * secondIntItem
+		return firstIntItem * secondIntItem, nil
+	}
+	_, err := link.Reduce(reduceFunction)
+
+	assert.Equal(expectedError, err)
+}
+
+func TestReduceWithErrorInReduceFunction(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 26
+	inputSlice := []int{987, 8, errorValue}
+	expectedError := errors.New("an example error yo")
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
+		firstIntItem := firstItem.(int)
+		secondIntItem := secondItem.(int)
+		if firstIntItem == errorValue || secondIntItem == errorValue {
+			return 0, expectedError
+		}
+
+		return firstIntItem * secondIntItem, nil
 	}
 	_, err := link.Reduce(reduceFunction)
 

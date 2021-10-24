@@ -171,7 +171,7 @@ func (receiver *Link) NoneMatch(noneMatchFunction func(interface{}) (bool, error
 	return !match, err
 }
 
-func (receiver *Link) Reduce(reduceFunction func(interface{}, interface{}) interface{}) (*interface{}, error) {
+func (receiver *Link) Reduce(reduceFunction func(interface{}, interface{}) (interface{}, error)) (*interface{}, error) {
 	nextItem, err := receiver.generator()
 	if err != nil {
 		if errors.Is(err, generator.Exhausted) {
@@ -191,7 +191,11 @@ func (receiver *Link) Reduce(reduceFunction func(interface{}, interface{}) inter
 	}
 
 	for err == nil {
-		intermediateItem = reduceFunction(intermediateItem, nextItem)
+		intermediateItem, err = reduceFunction(intermediateItem, nextItem)
+		if err != nil {
+			break
+		}
+
 		nextItem, err = receiver.generator()
 	}
 
