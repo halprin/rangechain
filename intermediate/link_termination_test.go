@@ -505,6 +505,28 @@ func TestNoneMatchWithEarlierError(t *testing.T) {
 	assert.Equal(expectedError, err)
 }
 
+func TestNoneMatchWithErrorInMatchFunction(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 3
+	inputSlice := []int{985, errorValue, 27}
+	expectedError := errors.New("an example error yo")
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	noneMatchFunction := func(value interface{}) (bool, error) {
+		intValue := value.(int)
+		if intValue == errorValue {
+			return false, expectedError
+		}
+		return intValue % 2 == 0, nil  //even means true
+	}
+	noneMatch, err := link.NoneMatch(noneMatchFunction)
+
+	assert.True(noneMatch)
+	assert.Equal(expectedError, err)
+}
+
 func TestReduce(t *testing.T) {
 	assert := assert.New(t)
 
