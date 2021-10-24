@@ -88,7 +88,9 @@ func (receiver *Link) Count() (int, error) {
 			if errors.Is(err, generator.Exhausted) {
 				return count, firstError
 			} else if !errors.Is(err, generator.Exhausted) {
-				firstError = err
+				if firstError == nil {
+					firstError = err
+				}
 			}
 		}
 

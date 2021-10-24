@@ -143,8 +143,21 @@ func TestForEachParallelHasError(t *testing.T) {
 func TestCount(t *testing.T) {
 	assert := assert.New(t)
 
+	inputSlice := []int{987, 8, 26}
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	actualCount, err := link.Count()
+
+	assert.Equal(len(inputSlice), actualCount)
+	assert.Nil(err)
+}
+
+func TestCountWithErrorStillCounts(t *testing.T) {
+	assert := assert.New(t)
+
 	errorValue := 8
-	inputSlice := []int{987, errorValue, 26}
+	inputSlice := []int{987, errorValue, errorValue}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
 	link := NewLink(generation)
@@ -155,17 +168,20 @@ func TestCount(t *testing.T) {
 	assert.Equal(expectedError, err)
 }
 
-func TestCountWithErrorStillCounts(t *testing.T) {
+func TestCountWithFirstErrorReturns(t *testing.T) {
 	assert := assert.New(t)
 
-	inputSlice := []int{987, 8, 26}
-	generation := generator.FromSlice(inputSlice)
+	errorValue := 8
+	secondErrorValue := 26
+	inputSlice := []int{987, errorValue, secondErrorValue}
+	expectedError := errors.New("an example error yo")
+	secondError := errors.New("another error")
+	generation := wrapGeneratorWithError(createGeneratorWithError(inputSlice, errorValue, expectedError), secondErrorValue, secondError)
 	link := NewLink(generation)
 
-	actualCount, err := link.Count()
+	_, err := link.Count()
 
-	assert.Equal(len(inputSlice), actualCount)
-	assert.Nil(err)
+	assert.Equal(expectedError, err)
 }
 
 func TestFirst(t *testing.T) {
@@ -732,4 +748,18 @@ func TestReduceWithInitialValueWithErrorInReduceFunction(t *testing.T) {
 	_, err := link.ReduceWithInitialValue(reduceFunction, 4)
 
 	assert.Equal(expectedError, err)
+}
+
+func wrapGeneratorWithError(generation func () (interface{}, error), valueToErrorOn int, errorToReturn error) func() (interface{}, error) {
+	return func() (interface{}, error) {
+		value, err := generation()
+
+		if err != nil {
+			return value, err
+		} else if value == valueToErrorOn {
+			return 0, errorToReturn
+		}
+
+		return value, err
+	}
 }
