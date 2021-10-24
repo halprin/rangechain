@@ -258,9 +258,9 @@ func TestAllMatch(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	allMatchFunction := func(value interface{}) bool {
+	allMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
-		return intValue % 2 == 0  //even means true
+		return intValue % 2 == 0, nil  //even means true
 	}
 	match, err := link.AllMatch(allMatchFunction)
 
@@ -275,9 +275,9 @@ func TestNotAllMatch(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	allMatchFunction := func(value interface{}) bool {
+	allMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
-		return intValue % 2 == 0  //even means true
+		return intValue % 2 == 0, nil  //even means true
 	}
 	match, err := link.AllMatch(allMatchFunction)
 
@@ -292,9 +292,9 @@ func TestAllMatchWithEmptySlice(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
 
-	allMatchFunction := func(value interface{}) bool {
+	allMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
-		return intValue % 2 == 0  //even means true
+		return intValue % 2 == 0, nil  //even means true
 	}
 	match, err := link.AllMatch(allMatchFunction)
 
@@ -305,15 +305,37 @@ func TestAllMatchWithEmptySlice(t *testing.T) {
 func TestAllMatchWithEarlierError(t *testing.T) {
 	assert := assert.New(t)
 
-	errorValue := 984
-	inputSlice := []int{errorValue, 8, 26}
+	errorValue := 8
+	inputSlice := []int{984, errorValue, 26}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
 	link := NewLink(generation)
 
-	allMatchFunction := func(value interface{}) bool {
+	allMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
-		return intValue % 2 == 0  //even means true
+		return intValue % 2 == 0, nil  //even means true
+	}
+	match, err := link.AllMatch(allMatchFunction)
+
+	assert.False(match)
+	assert.Equal(expectedError, err)
+}
+
+func TestAllMatchWithErrorInMatchFunction(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 8
+	inputSlice := []int{984, errorValue, 26}
+	expectedError := errors.New("an example error yo")
+	generation := generator.FromSlice(inputSlice)
+	link := NewLink(generation)
+
+	allMatchFunction := func(value interface{}) (bool, error) {
+		intValue := value.(int)
+		if intValue == errorValue {
+			return true, expectedError
+		}
+		return intValue % 2 == 0, nil  //even means true
 	}
 	match, err := link.AllMatch(allMatchFunction)
 
