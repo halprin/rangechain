@@ -166,9 +166,9 @@ func (receiver *Link) AnyMatch(anyMatchFunction func(interface{}) (bool, error))
 	}
 }
 
-func (receiver *Link) NoneMatch(noneMatchFunction func(interface{}) (bool, error)) bool {
-	match, _ := receiver.AnyMatch(noneMatchFunction)
-	return !match
+func (receiver *Link) NoneMatch(noneMatchFunction func(interface{}) (bool, error)) (bool, error) {
+	match, err := receiver.AnyMatch(noneMatchFunction)
+	return !match, err
 }
 
 func (receiver *Link) Reduce(reduceFunction func(interface{}, interface{}) interface{}) *interface{} {

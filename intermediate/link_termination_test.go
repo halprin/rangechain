@@ -436,6 +436,8 @@ func TestAnyMatchWithErrorInMatchFunction(t *testing.T) {
 }
 
 func TestNoneMatch(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{985, 3, 27}
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
@@ -444,12 +446,15 @@ func TestNoneMatch(t *testing.T) {
 		intValue := value.(int)
 		return intValue % 2 == 0, nil  //even means true
 	}
-	match := link.NoneMatch(noneMatchFunction)
+	noneMatch, err := link.NoneMatch(noneMatchFunction)
 
-	assert.True(t, match)
+	assert.True(noneMatch)
+	assert.Nil(err)
 }
 
 func TestNotNoneMatch(t *testing.T) {
+	assert := assert.New(t)
+
 	inputSlice := []int{985, 7, 28}
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
@@ -458,12 +463,15 @@ func TestNotNoneMatch(t *testing.T) {
 		intValue := value.(int)
 		return intValue % 2 == 0, nil  //even means true
 	}
-	match := link.NoneMatch(noneMatchFunction)
+	noneMatch, err := link.NoneMatch(noneMatchFunction)
 
-	assert.False(t, match)
+	assert.False(noneMatch)
+	assert.Nil(err)
 }
 
 func TestNoneMatchWithEmptySlice(t *testing.T) {
+	assert := assert.New(t)
+
 	var inputSlice []int
 	generation := generator.FromSlice(inputSlice)
 	link := NewLink(generation)
@@ -472,9 +480,29 @@ func TestNoneMatchWithEmptySlice(t *testing.T) {
 		intValue := value.(int)
 		return intValue % 2 == 0, nil  //even means true
 	}
-	match := link.NoneMatch(noneMatchFunction)
+	noneMatch, err := link.NoneMatch(noneMatchFunction)
 
-	assert.True(t, match)
+	assert.True(noneMatch)
+	assert.Nil(err)
+}
+
+func TestNoneMatchWithEarlierError(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 3
+	inputSlice := []int{985, errorValue, 27}
+	expectedError := errors.New("an example error yo")
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	noneMatchFunction := func(value interface{}) (bool, error) {
+		intValue := value.(int)
+		return intValue % 2 == 0, nil  //even means true
+	}
+	noneMatch, err := link.NoneMatch(noneMatchFunction)
+
+	assert.True(noneMatch)
+	assert.Equal(expectedError, err)
 }
 
 func TestReduce(t *testing.T) {
