@@ -207,7 +207,7 @@ func (receiver *Link) Reduce(reduceFunction func(interface{}, interface{}) (inte
 	return &intermediateItem, err
 }
 
-func (receiver *Link) ReduceWithInitialValue(reduceFunction func(interface{}, interface{}) interface{}, initialValue interface{}) (interface{}, error) {
+func (receiver *Link) ReduceWithInitialValue(reduceFunction func(interface{}, interface{}) (interface{}, error), initialValue interface{}) (interface{}, error) {
 	nextItem, err := receiver.generator()
 	if err != nil {
 		if errors.Is(err, generator.Exhausted) {
@@ -220,7 +220,11 @@ func (receiver *Link) ReduceWithInitialValue(reduceFunction func(interface{}, in
 	intermediateItem := initialValue
 
 	for err == nil {
-		intermediateItem = reduceFunction(intermediateItem, nextItem)
+		intermediateItem, err = reduceFunction(intermediateItem, nextItem)
+		if err != nil {
+			break
+		}
+
 		nextItem, err = receiver.generator()
 	}
 

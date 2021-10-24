@@ -31,13 +31,13 @@ func TestReduceToMapExample(t *testing.T) {
 	chain := FromSlice(stringSlice)
 
 	outputMap, _ := chain.
-		ReduceWithInitialValue(func(firstItem interface{}, secondItem interface{}) interface{} {
+		ReduceWithInitialValue(func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 			reductionMap := firstItem.(map[string]int)
 			stringItem := secondItem.(string)
 
 			reductionMap[stringItem] = len(stringItem)
 
-			return reductionMap
+			return reductionMap, nil
 		}, map[string]int{})
 
 	fmt.Println(outputMap)
