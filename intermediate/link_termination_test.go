@@ -587,6 +587,26 @@ func TestReduceWithZeroItems(t *testing.T) {
 	assert.Nil(err)
 }
 
+func TestReduceWithEarlierError(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 26
+	inputSlice := []int{987, 8, errorValue}
+	expectedError := errors.New("an example error yo")
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	reduceFunction := func(firstItem interface{}, secondItem interface{}) interface{} {
+		firstIntItem := firstItem.(int)
+		secondIntItem := secondItem.(int)
+
+		return firstIntItem * secondIntItem
+	}
+	_, err := link.Reduce(reduceFunction)
+
+	assert.Equal(expectedError, err)
+}
+
 func TestReduceWithInitialValue(t *testing.T) {
 	inputSlice := []int{987, 8, 26}
 	inputInitialValue := 4
