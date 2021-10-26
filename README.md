@@ -73,7 +73,7 @@ terminating method is called.
 | `MapParallel` | • `mapFunction` - A function that takes a single argument and returns a value and an optional error. | Will run the function across all the values in the chain in parallel.  Return what you want to change the value into and an optional error if an error is encountered.  There is overhead to running in parallel so benchmark to ensure you benefit from this version. |
 | `Filter` | • `filterFunction` - A function that takes a single argument and returns a boolean and an optional error. | Will run the function across all the values in the chain.  On return of true, the value will stay; on false, the value will be removed. |
 | `FilterParallel` | • `filterFunction` - A function that takes a single argument and returns a boolean and an optional error. | Will run the function across all the values in the chain in parallel.  On return of true, the value will stay; on false, the value will be removed.  There is overhead to running in parallel so benchmark to ensure you benefit from this version. |
-| `Skip` | • `skipNumber` - An int. | The number of values will be skipped over and effectively removed. |
+| `Skip` | • `skipNumber` - An int. | The number of values will be skipped over and effectively removed.  Also skips over any errors previously generated. |
 | `Limit` | • `keepSize` - An int. | The chain will stop after `keepSize` values.  Any elements afterward are effectively removed. |
 | `Distinct` | _None_ | Any duplicates will be removed. |
 | `Flatten` | _None_ | Any value that is a range-able container itself will have its elements iterated over first before continuing with the remaining values.  Maps flatten to its `generator.MapTuple` key and value pairs. |
@@ -90,11 +90,11 @@ executed first.
 | --- | --- | --- |
 | `Slice` | _None_ | Serializes the chain into a slice and returns it.  Also returns an error if any previous chain method generated an error.  If an error is returned, the slice is filled in until the error was encountered. |
 | `Channel` | _None_ | Serializes the chain into a channel.  Also returns any errors in a channel if any previous chain method generated an error.  If an error is returned, the value channel is closed, the error is sent on the error channel, and the error channel is closed. |
-| `ForEach` |  |  |
-| `ForEachParallel` |  |  |
-| `Count` |  |  |
-| `First` |  |  |
-| `Last` |  |  |
+| `ForEach` | • `forEachFunction` - A function that takes a single argument. | Will run the function across all the values in the chain.  Also returns an error if any previous chain method generated an error.  If an error is encountered, the function stops executing against the remaining chain. |
+| `ForEachParallel` | • `forEachFunction` - A function that takes a single argument. | Will run the function across all the values in the chain in parallel.  Also returns an error if any previous chain method generated an error.  If an error is encountered, the function stops executing against the remaining chain.  There is overhead to running in parallel so benchmark to ensure you benefit from this version. |
+| `Count` | _None_ | Returns the number of values in the chain.  Also returns an error if any previous chain method generated an error.  Count returns an accurate number even if an error is encountered. |
+| `First` | _None_ | Returns just a pointer to the first value in the chain.  If the chain is empty, returns `nil`.  Also returns an error if any previous chain method generated an error that affects the first value. |
+| `Last` | _None_ | Returns just a pointer to the last value in the chain.  If the chain is empty, returns `nil`.  Also returns an error if any previous chain method generated an error that affects the last value. |
 | `AllMatch` |  |  |
 | `AnyMatch` |  |  |
 | `NoneMatch` |  |  |
