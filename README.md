@@ -71,12 +71,12 @@ terminating method is called.
 | --- | --- | --- |
 | `Map` | • `mapFunction` - A function that takes a single argument and returns a value and an optional error. | Will run the function across all the values in the chain.  Return what you want to change the value into and an optional error if an error is encountered. |
 | `Filter` | • `filterFunction` - A function that takes a single argument and returns a boolean and an optional error. | Will run the function across all the values in the chain.  On return of true, the value will stay; on false, the value will be removed. |
-| `Skip` |  |  |
-| `Limit` |  |  |
-| `Distinct` |  |  |
-| `Flatten` |  |  |
-| `Sort` |  |  |
-| `Reverse` |  |  |
+| `Skip` | • `skipNumber` - An int. | The number of values will be skipped over and effectively removed. |
+| `Limit` | • `keepSize` - An int. | The chain will stop after `keepSize` values.  Any elements afterward are effectively removed. |
+| `Distinct` | _None_ | Any duplicates will be removed. |
+| `Flatten` | _None_ | Any value that is a range-able container itself will have its elements iterated over first before continuing with the remaining values.  Maps flatten to its `generator.MapTuple` key and value pairs. |
+| `Sort` | • `returnLessFunction` - A function that is given the entire serialized chain as a slice and _returns_ a function that satisfies the same requirements as the [Interface type's](https://pkg.go.dev/sort#Interface) `Less` function. | Sorts the chain given the `Less` function mentioned previously.  See the [`TestSortingMaps` example](https://github.com/halprin/rangechain/blob/main/example_test.go).  This method is expensive because it must serialize all the values into a slice first. |
+| `Reverse` | _None_ | Reverses the chain.  The last item will be first, and the first item will be last.  This method is expensive because it must serialize all the values into a slice first. |
 
 ### Terminating the Chain
 
