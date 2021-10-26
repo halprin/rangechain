@@ -14,7 +14,7 @@ func (receiver *Link) Slice() ([]interface{}, error) {
 			if errors.Is(err, generator.Exhausted) {
 				return endSlice, nil
 			} else {
-				return nil, err
+				return endSlice, err
 			}
 		}
 

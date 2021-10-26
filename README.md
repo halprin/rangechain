@@ -86,4 +86,19 @@ Terminating methods also apply some modification, requests some information, or 
 They stop the chaining by returning an actual value.  This value will depend on all the previous chaining methods being
 executed first.
 
+| Method | Arguments | Description |
+| --- | --- | --- |
+| `Slice` | _None_ | Serializes the chain into a slice and returns it.  Also returns an error if any previous chain method generated an error.  If an error is returned, the slice is filled in until the error was encountered. |
+| `Channel` | _None_ | Serializes the chain into a channel.  Also returns any errors in a channel if any previous chain method generated an error.  If an error is returned, the value channel is closed, the error is sent on the error channel, and the error channel is closed. |
+| `ForEach` |  |  |
+| `ForEachParallel` |  |  |
+| `Count` |  |  |
+| `First` |  |  |
+| `Last` |  |  |
+| `AllMatch` |  |  |
+| `AnyMatch` |  |  |
+| `NoneMatch` |  |  |
+| `Reduce` |  |  |
+| `ReduceWithInitialValue` |  |  |
+
 ## Examples

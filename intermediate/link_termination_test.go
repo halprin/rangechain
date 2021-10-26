@@ -22,6 +22,21 @@ func TestSlice(t *testing.T) {
 	assert.Nil(err)
 }
 
+func TestSliceWithErrorReturnsPartOfSlice(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 26
+	inputSlice := []int{987, 8, errorValue}
+	expectedError := errors.New("an example error yo")
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := NewLink(generation)
+
+	actualSlice, err := link.Slice()
+
+	assert.Equal([]interface{}{987, 8}, actualSlice)
+	assert.Equal(expectedError, err)
+}
+
 func TestChannel(t *testing.T) {
 	assert := assert.New(t)
 
