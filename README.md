@@ -70,7 +70,9 @@ terminating method is called.
 | Method | Arguments | Description |
 | --- | --- | --- |
 | `Map` | • `mapFunction` - A function that takes a single argument and returns a value and an optional error. | Will run the function across all the values in the chain.  Return what you want to change the value into and an optional error if an error is encountered. |
+| `MapParallel` | • `mapFunction` - A function that takes a single argument and returns a value and an optional error. | Will run the function across all the values in the chain in parallel.  Return what you want to change the value into and an optional error if an error is encountered.  There is overhead to running in parallel so benchmark to ensure you benefit from this version. |
 | `Filter` | • `filterFunction` - A function that takes a single argument and returns a boolean and an optional error. | Will run the function across all the values in the chain.  On return of true, the value will stay; on false, the value will be removed. |
+| `FilterParallel` | • `filterFunction` - A function that takes a single argument and returns a boolean and an optional error. | Will run the function across all the values in the chain in parallel.  On return of true, the value will stay; on false, the value will be removed.  There is overhead to running in parallel so benchmark to ensure you benefit from this version. |
 | `Skip` | • `skipNumber` - An int. | The number of values will be skipped over and effectively removed. |
 | `Limit` | • `keepSize` - An int. | The chain will stop after `keepSize` values.  Any elements afterward are effectively removed. |
 | `Distinct` | _None_ | Any duplicates will be removed. |
