@@ -2,6 +2,7 @@ package rangechain
 
 import (
 	"fmt"
+	"github.com/halprin/rangechain/generator"
 	"testing"
 )
 
@@ -41,4 +42,36 @@ func TestReduceToMapExample(t *testing.T) {
 		}, map[string]int{})
 
 	fmt.Println(outputMap)
+}
+
+func TestSortingMaps(t *testing.T) {
+	aMap := map[string]int{
+		"DogCow": 10,
+		"System 7": 7,
+		"Mac OS 8": 8,
+		"Mac OS 9": 9,
+		"Mac OS X": 10,
+		"QuickTime": 3,
+		"Exposé": 7,
+		"Control Strip": 6,
+		"Finder": 5,
+	}
+
+	chain := FromMap(aMap)
+	sortedAppleStuff, _ := chain.Sort(func(mapValuesToSort []interface{}) func(int, int) bool {
+		return func(index1 int, index2 int) bool {
+			mapValue1 := mapValuesToSort[index1].(generator.MapTuple)
+			mapValue2 := mapValuesToSort[index2].(generator.MapTuple)
+
+			rating1 := mapValue1.Value.(int)
+			rating2 := mapValue2.Value.(int)
+
+			return rating1 > rating2
+		}
+	}).Map(func(value interface{}) (interface{}, error) {
+		mapValue := value.(generator.MapTuple)
+		return mapValue.Key, nil
+	}).Slice()
+
+	fmt.Println(sortedAppleStuff)
 }
