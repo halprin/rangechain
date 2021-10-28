@@ -5,7 +5,7 @@ E.g. slices, arrays, maps, and channels.
 ## Install
 
 Require `github.com/halprin/rangechain` in your `go.mod` file or use `go` to add it.
-```bash
+```shell
 $ go get github.com/halprin/rangechain
 ```
 
