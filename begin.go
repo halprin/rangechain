@@ -5,6 +5,7 @@ import (
 	"github.com/halprin/rangechain/intermediate"
 )
 
+// FromSlice starts the chain with the supplied slice.  Chaining and terminating methods can now be called on the result.
 func FromSlice(slice interface{}) *intermediate.Link {
 	sliceGenerator := generator.FromSlice(slice)
 
