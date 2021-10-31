@@ -2,6 +2,7 @@ package intermediate
 
 import "github.com/halprin/rangechain/generator"
 
+// MapParallel will run the `mapFunction` parameter function against all the values in the chain in parallel.  In that function, return what you want to change the value into or an optional error if an error is encountered.  There is overhead to running in parallel so benchmark to ensure you benefit from this version.
 func (receiver *Link) MapParallel(mapFunction func(interface{}) (interface{}, error)) *Link {
 	computedValues := false
 	var mappedReturnValues []chan interface{}
@@ -58,6 +59,7 @@ func pipeReturnAndErrorValueToChannels(mapFunction func(interface{}) (interface{
 	close(returnErrorChannel)
 }
 
+// FilterParallel will run the `filterFunction` parameter function against all the values in the chain in parallel.  In that function, on return of true, the value will stay in the chain, or on false, the value will be removed from the chain.  There is overhead to running in parallel so benchmark to ensure you benefit from this version.
 func (receiver *Link) FilterParallel(filterFunction func(interface{}) (bool, error)) *Link {
 	computedValues := false
 	var mappedReturnValues []chan interface{}
