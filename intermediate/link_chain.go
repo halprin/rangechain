@@ -7,6 +7,7 @@ import (
 	"sort"
 )
 
+// Map will run the `mapFunction` parameter function parameter against all the values in the chain.  In that function, return what you want to change the value into or an optional error if an error is encountered.
 func (receiver *Link) Map(mapFunction func(interface{}) (interface{}, error)) *Link {
 	mapGenerator := func() (interface{}, error) {
 		valueToMap, err := receiver.generator()
@@ -20,6 +21,7 @@ func (receiver *Link) Map(mapFunction func(interface{}) (interface{}, error)) *L
 	return NewLink(mapGenerator)
 }
 
+// Filter will run the `filterFunction` parameter function against all the values in the chain.  In that function, on return of true, the value will stay, or on false, the value will be removed.
 func (receiver *Link) Filter(filterFunction func(interface{}) (bool, error)) *Link {
 	filterGenerator := func() (interface{}, error) {
 		//go through the generator until you find an item that stays
@@ -42,6 +44,7 @@ func (receiver *Link) Filter(filterFunction func(interface{}) (bool, error)) *Li
 	return NewLink(filterGenerator)
 }
 
+// Skip skips over the parameter `skipNumber` number of values and effectively removes them from the chain.  Also skips over any errors previously generated.
 func (receiver *Link) Skip(skipNumber int) *Link {
 	for count := 0; count < skipNumber; count++ {
 		_, _ = receiver.generator()
@@ -50,6 +53,7 @@ func (receiver *Link) Skip(skipNumber int) *Link {
 	return NewLink(receiver.generator)
 }
 
+// Limit stops the chain after the parameter `keepSize` number of values.  Any elements afterward are effectively removed.
 func (receiver *Link) Limit(keepSize int) *Link {
 	itemsSeen := 0
 
@@ -71,6 +75,7 @@ func (receiver *Link) Limit(keepSize int) *Link {
 	return NewLink(limitGenerator)
 }
 
+// Distinct removes any duplicates.
 func (receiver *Link) Distinct() *Link {
 	seenTracker := helper.NewSet()
 
@@ -92,6 +97,7 @@ func (receiver *Link) Distinct() *Link {
 	return NewLink(distinctGenerator)
 }
 
+// Flatten will iterate over all the values in the chain, but any value encountered that is a range-able container itself will also have its values iterated over first before continuing with the remaining values in the chain.  Maps flatten to its `generator.MapTuple` key and value pairs.
 func (receiver *Link) Flatten() *Link {
 	var currentGenerator func() (interface{}, error)
 
@@ -136,6 +142,7 @@ func (receiver *Link) Flatten() *Link {
 	return NewLink(flattenGenerator)
 }
 
+// Sort Sorts the chain given the `Less` function returned from the `returnLessFunction` function parameter.  The `returnLessFunction` function is called with the entire serialized chain as a slice and _returns_ a function that satisfies the same requirements as the [Interface type's](https://pkg.go.dev/sort#Interface) `Less` function.  This method is expensive because it must serialize all the values into a slice first.
 func (receiver *Link) Sort(returnLessFunction func([]interface{}) func(int, int) bool) *Link {
 	serializedSlice, err := receiver.Slice()
 	if err != nil {
@@ -155,6 +162,7 @@ func (receiver *Link) Sort(returnLessFunction func([]interface{}) func(int, int)
 	return NewLink(generation)
 }
 
+// Reverse reverses the order of the chain.  The last item will be first, and the first item will be last.  This method is expensive because it must serialize all the values into a slice first.
 func (receiver *Link) Reverse() *Link {
 	serializedSlice, err := receiver.Slice()
 	if err != nil {

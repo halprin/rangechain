@@ -67,22 +67,22 @@ on any changes performed by the previous chain method.
 Because modifications are lazily computed, none of the modifications from chaining methods are applied until _after_ a
 terminating method is called.
 
-| Method | Arguments | Description |
-| --- | --- | --- |
-| `Map` | • `mapFunction` - A function that takes a single argument and returns a value and an optional error. | Will run the function across all the values in the chain.  Return what you want to change the value into and an optional error if an error is encountered. |
-| `MapParallel` | • `mapFunction` - A function that takes a single argument and returns a value and an optional error. | Will run the function across all the values in the chain in parallel.  Return what you want to change the value into and an optional error if an error is encountered.  There is overhead to running in parallel so benchmark to ensure you benefit from this version. |
-| `Filter` | • `filterFunction` - A function that takes a single argument and returns a boolean and an optional error. | Will run the function across all the values in the chain.  On return of true, the value will stay; on false, the value will be removed. |
-| `FilterParallel` | • `filterFunction` - A function that takes a single argument and returns a boolean and an optional error. | Will run the function across all the values in the chain in parallel.  On return of true, the value will stay; on false, the value will be removed.  There is overhead to running in parallel so benchmark to ensure you benefit from this version. |
-| `Skip` | • `skipNumber` - An int. | The number of values will be skipped over and effectively removed.  Also skips over any errors previously generated. |
-| `Limit` | • `keepSize` - An int. | The chain will stop after `keepSize` values.  Any elements afterward are effectively removed. |
-| `Distinct` | _None_ | Any duplicates will be removed. |
-| `Flatten` | _None_ | Any value that is a range-able container itself will have its elements iterated over first before continuing with the remaining values.  Maps flatten to its `generator.MapTuple` key and value pairs. |
-| `Sort` | • `returnLessFunction` - A function that is given the entire serialized chain as a slice and _returns_ a function that satisfies the same requirements as the [Interface type's](https://pkg.go.dev/sort#Interface) `Less` function. | Sorts the chain given the `Less` function mentioned previously.  See the [`TestSortingMaps` example](./example_test.go).  This method is expensive because it must serialize all the values into a slice first. |
-| `Reverse` | _None_ | Reverses the chain.  The last item will be first, and the first item will be last.  This method is expensive because it must serialize all the values into a slice first. |
+| Method | Description |
+| --- | --- |
+| `Map` | Will run the `mapFunction` parameter function parameter against all the values in the chain.  In that function, return what you want to change the value into or an optional error if an error is encountered. |
+| `MapParallel` | Will run the `mapFunction` parameter function against all the values in the chain in parallel.  In that function, return what you want to change the value into or an optional error if an error is encountered.  There is overhead to running in parallel so benchmark to ensure you benefit from this version. |
+| `Filter` | Will run the `filterFunction` parameter function against all the values in the chain.  In that function, on return of true, the value will stay, or on false, the value will be removed. |
+| `FilterParallel` | Will run the `filterFunction` parameter function against all the values in the chain in parallel.  In that function, on return of true, the value will stay in the chain, or on false, the value will be removed from the chain.  There is overhead to running in parallel so benchmark to ensure you benefit from this version. |
+| `Skip` | Skips over the parameter `skipNumber` number of values and effectively removes them from the chain.  Also skips over any errors previously generated. |
+| `Limit` | Stops the chain after the parameter `keepSize` number of values.  Any elements afterward are effectively removed. |
+| `Distinct` | Removes any duplicates. |
+| `Flatten` | Will iterate over all the values in the chain, but any value encountered that is a range-able container itself will also have its values iterated over first before continuing with the remaining values in the chain.  Maps flatten to its `generator.MapTuple` key and value pairs. |
+| `Sort` | Sorts the chain given the `Less` function returned from the `returnLessFunction` function parameter.  The `returnLessFunction` function is called with the entire serialized chain as a slice and _returns_ a function that satisfies the same requirements as the [Interface type's](https://pkg.go.dev/sort#Interface) `Less` function.  See the [`TestSortingMaps` example](./example_test.go).  This method is expensive because it must serialize all the values into a slice first. |
+| `Reverse` | Reverses the order of the chain.  The last item will be first, and the first item will be last.  This method is expensive because it must serialize all the values into a slice first. |
 
 ### Terminating the Chain
 
-Terminating methods also apply some modification, requests some information, or executes something on the elements.
+Terminating methods also apply some modification, requests some information, or executes something on the values.
 They stop the chaining by returning an actual value.  This value will depend on all the previous chaining methods being
 executed first.
 
