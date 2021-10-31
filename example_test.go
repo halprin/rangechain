@@ -2,7 +2,7 @@ package rangechain
 
 import (
 	"fmt"
-	"github.com/halprin/rangechain/generator"
+	"github.com/halprin/rangechain/internal/generator"
 	"testing"
 )
 

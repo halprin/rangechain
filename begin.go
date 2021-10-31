@@ -1,8 +1,8 @@
 package rangechain
 
 import (
-	"github.com/halprin/rangechain/generator"
 	"github.com/halprin/rangechain/intermediate"
+	"github.com/halprin/rangechain/internal/generator"
 )
 
 // FromSlice starts the chain with the supplied slice.

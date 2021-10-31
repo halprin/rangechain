@@ -1,6 +1,6 @@
 package intermediate
 
-import "github.com/halprin/rangechain/generator"
+import "github.com/halprin/rangechain/internal/generator"
 
 // MapParallel will run the `mapFunction` parameter function against all the values in the chain in parallel.  In that function, return what you want to change the value into or an optional error if an error is encountered.  There is overhead to running in parallel so benchmark to ensure you benefit from this version.
 func (receiver *Link) MapParallel(mapFunction func(interface{}) (interface{}, error)) *Link {

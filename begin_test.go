@@ -1,7 +1,7 @@
 package rangechain
 
 import (
-	"github.com/halprin/rangechain/generator"
+	"github.com/halprin/rangechain/internal/generator"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

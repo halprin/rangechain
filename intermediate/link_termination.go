@@ -2,7 +2,7 @@ package intermediate
 
 import (
 	"errors"
-	"github.com/halprin/rangechain/generator"
+	"github.com/halprin/rangechain/internal/generator"
 )
 
 // Slice serializes the chain into a slice and returns it.  Also returns an error if any previous chain method generated an error.  If an error is returned, the slice is filled in until the error was encountered.
