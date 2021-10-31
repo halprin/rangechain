@@ -16,7 +16,7 @@ type MapTuple struct {
 	Value interface{}
 }
 
-// FromSlice is not meant to be called directly by external users.  Creates a generator for a slice.
+// FromSlice creates a generator for a slice.
 func FromSlice(slice interface{}) func() (interface{}, error) {
 	if !helper.IsSlice(slice) {
 		panic("non-slice type provided")
@@ -25,7 +25,7 @@ func FromSlice(slice interface{}) func() (interface{}, error) {
 	return generatorFromSliceOrArray(slice)
 }
 
-// FromArray is not meant to be called directly by external users.  Creates a generator for an array.
+// FromArray creates a generator for an array.
 func FromArray(array interface{}) func() (interface{}, error) {
 	if !helper.IsArray(array) {
 		panic("non-array type provided")
@@ -34,7 +34,7 @@ func FromArray(array interface{}) func() (interface{}, error) {
 	return generatorFromSliceOrArray(array)
 }
 
-// FromChannel is not meant to be called directly by external users.  Creates a generator for a channel.
+// FromChannel creates a generator for a channel.
 func FromChannel(channel interface{}) func() (interface{}, error) {
 	if !helper.IsChannel(channel) {
 		panic("non-channel type provided")
@@ -54,7 +54,7 @@ func FromChannel(channel interface{}) func() (interface{}, error) {
 	}
 }
 
-// FromMap is not meant to be called directly by external users.  Creates a generator for a map.
+// FromMap creates a generator for a map.
 func FromMap(aMap interface{}) func() (interface{}, error) {
 	if !helper.IsMap(aMap) {
 		panic("non-map type provided")
