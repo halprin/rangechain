@@ -1,3 +1,4 @@
+// Package generator has many helper methods for generating values in a chain.
 package generator
 
 import (
@@ -6,13 +7,16 @@ import (
 	"reflect"
 )
 
+// Exhausted is returned as an expected error from the generators to designate an end of the generator.
 var Exhausted = errors.New("generator exhausted")
 
+// MapTuple is used to represent the key and value pairs of a map when iterating over a map.
 type MapTuple struct {
 	Key   interface{}
 	Value interface{}
 }
 
+// FromSlice is not meant to be called directly by external users.  Creates a generator for a slice.
 func FromSlice(slice interface{}) func() (interface{}, error) {
 	if !helper.IsSlice(slice) {
 		panic("non-slice type provided")
@@ -21,6 +25,7 @@ func FromSlice(slice interface{}) func() (interface{}, error) {
 	return generatorFromSliceOrArray(slice)
 }
 
+// FromArray is not meant to be called directly by external users.  Creates a generator for an array.
 func FromArray(array interface{}) func() (interface{}, error) {
 	if !helper.IsArray(array) {
 		panic("non-array type provided")
@@ -29,6 +34,7 @@ func FromArray(array interface{}) func() (interface{}, error) {
 	return generatorFromSliceOrArray(array)
 }
 
+// FromChannel is not meant to be called directly by external users.  Creates a generator for a channel.
 func FromChannel(channel interface{}) func() (interface{}, error) {
 	if !helper.IsChannel(channel) {
 		panic("non-channel type provided")
@@ -48,6 +54,7 @@ func FromChannel(channel interface{}) func() (interface{}, error) {
 	}
 }
 
+// FromMap is not meant to be called directly by external users.  Creates a generator for a map.
 func FromMap(aMap interface{}) func() (interface{}, error) {
 	if !helper.IsMap(aMap) {
 		panic("non-map type provided")
