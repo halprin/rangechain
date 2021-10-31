@@ -3,7 +3,7 @@ package generator
 
 import (
 	"errors"
-	"github.com/halprin/rangechain/helper"
+	"github.com/halprin/rangechain/internal/helper"
 	"reflect"
 )
 

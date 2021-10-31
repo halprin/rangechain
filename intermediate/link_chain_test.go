@@ -2,8 +2,8 @@ package intermediate
 
 import (
 	"errors"
-	"github.com/halprin/rangechain/helper"
 	"github.com/halprin/rangechain/internal/generator"
+	"github.com/halprin/rangechain/internal/helper"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
