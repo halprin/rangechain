@@ -142,7 +142,7 @@ func (receiver *Link) Flatten() *Link {
 	return NewLink(flattenGenerator)
 }
 
-// Sort Sorts the chain given the `Less` function returned from the `returnLessFunction` function parameter.  The `returnLessFunction` function is called with the entire serialized chain as a slice and _returns_ a function that satisfies the same requirements as the [Interface type's](https://pkg.go.dev/sort#Interface) `Less` function.  This method is expensive because it must serialize all the values into a slice first.
+// Sort sorts the chain given the `Less` function returned from the `returnLessFunction` function parameter.  The `returnLessFunction` function is called with the entire serialized chain as a slice and _returns_ a function that satisfies the same requirements as the Interface type's `Less` function (https://pkg.go.dev/sort#Interface).  This method is expensive because it must serialize all the values into a slice first.
 func (receiver *Link) Sort(returnLessFunction func([]interface{}) func(int, int) bool) *Link {
 	serializedSlice, err := receiver.Slice()
 	if err != nil {
