@@ -1,4 +1,4 @@
-package intermediate
+package rangechain
 
 
 import (
@@ -14,7 +14,7 @@ func TestSlice(t *testing.T) {
 	assert := assert.New(t)
 	expectedSlice := []int{987, 8, 26}
 	generation := generator.FromSlice(expectedSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	actualSlice, err := link.Slice()
 
@@ -29,7 +29,7 @@ func TestSliceWithErrorReturnsPartOfSlice(t *testing.T) {
 	inputSlice := []int{987, 8, errorValue}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	actualSlice, err := link.Slice()
 
@@ -42,7 +42,7 @@ func TestChannel(t *testing.T) {
 
 	expectedSlice := []int{987, 8, 26}
 	generation := generator.FromSlice(expectedSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	var seenItems []interface{}
 	valueChannel, errorChannel := link.Channel()
@@ -62,7 +62,7 @@ func TestChannelHasError(t *testing.T) {
 	inputSlice := []int{987, errorValue, 26}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	var seenItems []interface{}
 	valueChannel, errorChannel := link.Channel()
@@ -80,7 +80,7 @@ func TestForEach(t *testing.T) {
 
 	inputSlice := []int{987, 8, 26}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	var seenItems []interface{}
 	forEachFunction := func(value interface{}) {
@@ -97,7 +97,7 @@ func TestForEachHasError(t *testing.T) {
 	inputSlice := []int{987, errorValue, 26}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	forEachFunction := func(value interface{}) {}
 	err := link.ForEach(forEachFunction)
@@ -115,7 +115,7 @@ func TestForEachParallel(t *testing.T) {
 		8: true,
 	}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	seenItems := map[int]bool{}
 	seenItemsLock := sync.RWMutex{}
@@ -147,7 +147,7 @@ func TestForEachParallelHasError(t *testing.T) {
 	inputSlice := []int{987, errorValue, 26}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	forEachFunction := func(value interface{}) {}
 	err := link.ForEachParallel(forEachFunction)
@@ -160,7 +160,7 @@ func TestCount(t *testing.T) {
 
 	inputSlice := []int{987, 8, 26}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	actualCount, err := link.Count()
 
@@ -175,7 +175,7 @@ func TestCountWithErrorStillCounts(t *testing.T) {
 	inputSlice := []int{987, errorValue, errorValue}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	actualCount, err := link.Count()
 
@@ -192,7 +192,7 @@ func TestCountWithFirstErrorReturns(t *testing.T) {
 	expectedError := errors.New("an example error yo")
 	secondError := errors.New("another error")
 	generation := wrapGeneratorWithError(createGeneratorWithError(inputSlice, errorValue, expectedError), secondErrorValue, secondError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	_, err := link.Count()
 
@@ -204,7 +204,7 @@ func TestFirst(t *testing.T) {
 
 	inputSlice := []int{987, 8, 26}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	actualFirst, err := link.First()
 
@@ -218,7 +218,7 @@ func TestFirstWithEmptySlice(t *testing.T) {
 
 	var inputSlice []int
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	actualFirst, err := link.First()
 
@@ -233,7 +233,7 @@ func TestFirstHasError(t *testing.T) {
 	inputSlice := []int{errorValue, 8, 26}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	actualFirst, err := link.First()
 
@@ -246,7 +246,7 @@ func TestLast(t *testing.T) {
 
 	inputSlice := []int{987, 8, 26}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	actualLast, err := link.Last()
 
@@ -260,7 +260,7 @@ func TestLastWithEmptySlice(t *testing.T) {
 
 	var inputSlice []int
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	actualLast, err := link.Last()
 
@@ -275,7 +275,7 @@ func TestLastHasError(t *testing.T) {
 	inputSlice := []int{987, 8, errorValue}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	_, err := link.Last()
 
@@ -287,7 +287,7 @@ func TestAllMatch(t *testing.T) {
 
 	inputSlice := []int{984, 8, 26}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	allMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -304,7 +304,7 @@ func TestNotAllMatch(t *testing.T) {
 
 	inputSlice := []int{984, 7, 26}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	allMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -321,7 +321,7 @@ func TestAllMatchWithEmptySlice(t *testing.T) {
 
 	var inputSlice []int
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	allMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -340,7 +340,7 @@ func TestAllMatchWithEarlierError(t *testing.T) {
 	inputSlice := []int{984, errorValue, 26}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	allMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -359,7 +359,7 @@ func TestAllMatchWithErrorInMatchFunction(t *testing.T) {
 	inputSlice := []int{984, errorValue, 26}
 	expectedError := errors.New("an example error yo")
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	allMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -379,7 +379,7 @@ func TestAnyMatch(t *testing.T) {
 
 	inputSlice := []int{985, 3, 26}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	anyMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -396,7 +396,7 @@ func TestNotAnyMatch(t *testing.T) {
 
 	inputSlice := []int{985, 7, 29}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	anyMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -413,7 +413,7 @@ func TestAnyMatchWithEmptySlice(t *testing.T) {
 
 	var inputSlice []int
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	anyMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -432,7 +432,7 @@ func TestAnyMatchWithEarlierError(t *testing.T) {
 	inputSlice := []int{985, 3, errorValue}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	anyMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -451,7 +451,7 @@ func TestAnyMatchWithErrorInMatchFunction(t *testing.T) {
 	inputSlice := []int{985, 3, errorValue}
 	expectedError := errors.New("an example error yo")
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	anyMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -471,7 +471,7 @@ func TestNoneMatch(t *testing.T) {
 
 	inputSlice := []int{985, 3, 27}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	noneMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -488,7 +488,7 @@ func TestNotNoneMatch(t *testing.T) {
 
 	inputSlice := []int{985, 7, 28}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	noneMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -505,7 +505,7 @@ func TestNoneMatchWithEmptySlice(t *testing.T) {
 
 	var inputSlice []int
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	noneMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -524,7 +524,7 @@ func TestNoneMatchWithEarlierError(t *testing.T) {
 	inputSlice := []int{985, errorValue, 27}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	noneMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -543,7 +543,7 @@ func TestNoneMatchWithErrorInMatchFunction(t *testing.T) {
 	inputSlice := []int{985, errorValue, 27}
 	expectedError := errors.New("an example error yo")
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	noneMatchFunction := func(value interface{}) (bool, error) {
 		intValue := value.(int)
@@ -564,7 +564,7 @@ func TestReduce(t *testing.T) {
 	inputSlice := []int{987, 8, 26}
 	expectedValue := inputSlice[0] * inputSlice[1] * inputSlice[2]
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
@@ -584,7 +584,7 @@ func TestReduceWithOneItem(t *testing.T) {
 
 	inputSlice := []int{987}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
@@ -604,7 +604,7 @@ func TestReduceWithZeroItems(t *testing.T) {
 
 	inputSlice := []int{}
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
@@ -625,7 +625,7 @@ func TestReduceWithEarlierError(t *testing.T) {
 	inputSlice := []int{987, 8, errorValue}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
@@ -645,7 +645,7 @@ func TestReduceWithErrorInReduceFunction(t *testing.T) {
 	inputSlice := []int{987, 8, errorValue}
 	expectedError := errors.New("an example error yo")
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
@@ -668,7 +668,7 @@ func TestReduceWithInitialValue(t *testing.T) {
 	inputInitialValue := 4
 	expectedValue := inputInitialValue * inputSlice[0] * inputSlice[1] * inputSlice[2]
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
@@ -688,7 +688,7 @@ func TestReduceWithInitialValueWithOneItem(t *testing.T) {
 	inputSlice := []int{987}
 	inputInitialValue := 4
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
@@ -708,7 +708,7 @@ func TestReduceWithInitialValueWithZeroItems(t *testing.T) {
 	inputSlice := []int{}
 	inputInitialValue := 4
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
@@ -729,7 +729,7 @@ func TestReduceWithInitialValueWithEarlierError(t *testing.T) {
 	inputSlice := []int{987, errorValue, 26}
 	expectedError := errors.New("an example error yo")
 	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)
@@ -749,7 +749,7 @@ func TestReduceWithInitialValueWithErrorInReduceFunction(t *testing.T) {
 	inputSlice := []int{987, errorValue, 26}
 	expectedError := errors.New("an example error yo")
 	generation := generator.FromSlice(inputSlice)
-	link := NewLink(generation)
+	link := newLink(generation)
 
 	reduceFunction := func(firstItem interface{}, secondItem interface{}) (interface{}, error) {
 		firstIntItem := firstItem.(int)

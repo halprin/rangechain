@@ -1,4 +1,4 @@
-package intermediate
+package rangechain
 
 import "github.com/halprin/rangechain/internal/generator"
 
@@ -27,7 +27,7 @@ func (receiver *Link) MapParallel(mapFunction func(interface{}) (interface{}, er
 		return value, err
 	}
 
-	return NewLink(mapGenerator)
+	return newLink(mapGenerator)
 }
 
 func mapFunctionAgainstEntireGenerator(generatorToParallelize func() (interface{}, error), mapFunction func(interface{}) (interface{}, error)) ([]chan interface{}, []chan error) {
@@ -92,7 +92,7 @@ func (receiver *Link) FilterParallel(filterFunction func(interface{}) (bool, err
 		}
 	}
 
-	return NewLink(filterGenerator)
+	return newLink(filterGenerator)
 }
 
 func filterFunctionAgainstEntireGenerator(generatorToParallelize func() (interface{}, error), filterFunction func(interface{}) (bool, error)) ([]chan interface{}, []chan error) {

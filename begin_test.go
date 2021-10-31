@@ -35,7 +35,7 @@ func TestFromChannel(t *testing.T) {
 
 	innerInput := []string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
 	expectedOutput := []interface{}{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
-	input := createTestChannel(innerInput)
+	input := createTestStringChannel(innerInput)
 	chain := FromChannel(input)
 
 	slice, err := chain.Slice()
@@ -81,7 +81,7 @@ func TestFromMap(t *testing.T) {
 	assert.Nil(err)
 }
 
-func createTestChannel(stringSlice []string) chan string {
+func createTestStringChannel(stringSlice []string) chan string {
 	stringChannel := make(chan string)
 
 	go func() {
