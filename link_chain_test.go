@@ -243,13 +243,13 @@ func TestFlattenWithSliceAndMap(t *testing.T) {
 		1,
 		2,
 		3,
-		generator.MapTuple{
-			Key:   key1,
-			Value: value1,
+		&testKeyValue{
+			TheKey:   key1,
+			TheValue: value1,
 		},
-		generator.MapTuple{
-			Key:   key2,
-			Value: value2,
+		&testKeyValue{
+			TheKey:   key2,
+			TheValue: value2,
 		},
 		7,
 		8,
@@ -262,7 +262,7 @@ func TestFlattenWithSliceAndMap(t *testing.T) {
 	actualSlice, err := link.Flatten().Slice()
 
 	//not testing the order of the entire expected slice because we are not guaranteed the order in which a map is iterated over
-	assert.ElementsMatch(expectedSlice, actualSlice)
+	assertEqualsBasedOnKeyValuerInterface(t, expectedSlice, actualSlice)
 	assert.Nil(err)
 	//test the order for the non-map flattened parts
 	assert.Equal(expectedSlice[0], actualSlice[0])

@@ -10,12 +10,6 @@ import (
 // Exhausted is returned as an expected error from the generators to designate an end of the generator.
 var Exhausted = errors.New("generator exhausted")
 
-// MapTuple is used to represent the key and value pairs of a map when iterating over a map.
-type MapTuple struct {
-	Key   interface{}
-	Value interface{}
-}
-
 // FromSlice creates a generator for a slice.
 func FromSlice(slice interface{}) func() (interface{}, error) {
 	if !helper.IsSlice(slice) {
@@ -69,12 +63,12 @@ func FromMap(aMap interface{}) func() (interface{}, error) {
 			return 0, Exhausted
 		}
 
-		mapTuple := MapTuple{
-			Key:   mapIterator.Key().Interface(),
-			Value: mapIterator.Value().Interface(),
+		tuple := &mapTuple{
+			TheKey:   mapIterator.Key().Interface(),
+			TheValue: mapIterator.Value().Interface(),
 		}
 
-		return mapTuple, nil
+		return tuple, nil
 	}
 }
 

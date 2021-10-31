@@ -32,7 +32,7 @@ func FromChannel(channel interface{}) *Link {
 }
 
 // FromMap starts the chain with the supplied map.
-// Chaining and terminating methods can now be called on the result.  The singular value used to represent the key and value pairs is `generator.MapTuple` of `github.com/halprin/rangechain/generator`.
+// Chaining and terminating methods can now be called on the result.  The singular value used to represent the key and value pairs is `keyvalue.KeyValuer` of `github.com/halprin/rangechain/keyvalue`.
 func FromMap(aMap interface{}) *Link {
 	mapGenerator := generator.FromMap(aMap)
 

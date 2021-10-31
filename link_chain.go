@@ -97,7 +97,7 @@ func (receiver *Link) Distinct() *Link {
 	return newLink(distinctGenerator)
 }
 
-// Flatten will iterate over all the values in the chain, but any value encountered that is a range-able container itself will also have its values iterated over first before continuing with the remaining values in the chain.  Maps flatten to its `generator.MapTuple` key and value pairs.
+// Flatten will iterate over all the values in the chain, but any value encountered that is a range-able container itself will also have its values iterated over first before continuing with the remaining values in the chain.  Maps flatten to its `generator.mapTuple` key and value pairs.
 func (receiver *Link) Flatten() *Link {
 	var currentGenerator func() (interface{}, error)
 

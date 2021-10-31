@@ -1,7 +1,7 @@
 package rangechain
 
 import (
-	"github.com/halprin/rangechain/internal/generator"
+	"github.com/halprin/rangechain/keyvalue"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -61,24 +61,37 @@ func TestFromMap(t *testing.T) {
 	chain := FromMap(input)
 
 	expectedOutput := []interface{}{
-		generator.MapTuple{
-			Key: key1,
-			Value: value1,
+		&testKeyValue{
+			TheKey:   key1,
+			TheValue: value1,
 		},
-		generator.MapTuple{
-			Key: key2,
-			Value: value2,
+		&testKeyValue{
+			TheKey:   key2,
+			TheValue: value2,
 		},
-		generator.MapTuple{
-			Key: key3,
-			Value: value3,
+		&testKeyValue{
+			TheKey:   key3,
+			TheValue: value3,
 		},
 	}
 
 	slice, err := chain.Slice()
 	//not testing the order because we are not guaranteed the order in which a map is iterated over
-	assert.ElementsMatch(expectedOutput, slice)
+	assertEqualsBasedOnKeyValuerInterface(t, expectedOutput, slice)
 	assert.Nil(err)
+}
+
+type testKeyValue struct {
+	TheKey   interface{}
+	TheValue interface{}
+}
+
+func (t *testKeyValue) Key() interface{} {
+	return t.TheKey
+}
+
+func (t *testKeyValue) Value() interface{} {
+	return t.TheValue
 }
 
 func createTestStringChannel(stringSlice []string) chan string {
@@ -92,4 +105,39 @@ func createTestStringChannel(stringSlice []string) chan string {
 	}()
 
 	return stringChannel
+}
+
+func assertEqualsBasedOnKeyValuerInterface(t *testing.T, expected []interface{}, actual []interface{}) {
+	assert := assert.New(t)
+
+	assert.Len(actual, len(expected))
+
+	for _, expectedValue := range expected {
+		expectedKeyValuer, isType := expectedValue.(keyvalue.KeyValuer)
+		if !isType {
+			continue
+		}
+		keyToFind := expectedKeyValuer.Key()
+		foundMatch := false
+
+		for _, actualValue := range actual {
+			actualKeyValuer, isType := actualValue.(keyvalue.KeyValuer)
+			if !isType {
+				continue
+			}
+			actualKey := actualKeyValuer.Key()
+
+			if actualKey != keyToFind {
+				continue
+			}
+
+			if expectedKeyValuer.Value() != actualKeyValuer.Value() {
+				continue
+			}
+
+			foundMatch = true
+		}
+
+		assert.True(foundMatch)
+	}
 }
