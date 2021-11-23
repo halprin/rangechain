@@ -1,6 +1,6 @@
 package generator
 
-// mapTuple implements the `keyvalue.KeyValuer` interface and is used when
+// mapTuple implements the `keyvalue.KeyValuer` interface and is used to represent map's keys and values
 type mapTuple struct {
 	TheKey   interface{}
 	TheValue interface{}
