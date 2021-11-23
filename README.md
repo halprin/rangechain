@@ -31,7 +31,7 @@ chain := rangechain.FromSlice(container)
 | `FromSlice` | • `slice` - A slice to be used to start the chain. | Starts the chain with the supplied slice.  Chaining and terminating methods can now be called on the result. |
 | `FromArray` | • `array` - An array to be used to start the chain. | Starts the chain with the supplied array.  Chaining and terminating methods can now be called on the result. |
 | `FromChannel` | • `channel` - A channel to be used to start the chain. | Starts the chain with the supplied channel.  Chaining and terminating methods can now be called on the result. |
-| `FromMap` | • `aMap` - A map to be used to start the chain. | Starts the chain with the supplied map.  Chaining and terminating methods can now be called on the result.  The singular value used to represent the key and value pairs is `generator.MapTuple` of `github.com/halprin/rangechain/generator`. |
+| `FromMap` | • `aMap` - A map to be used to start the chain. | Starts the chain with the supplied map.  Chaining and terminating methods can now be called on the result.  The singular value used to represent the key and value pairs is `keyvalue.KeyValuer` of `github.com/halprin/rangechain/keyvalue`. |
 
 From there, one can call a plethora of additional methods to modify the container passed in originally.  The methods are
 outlined below.  The methods fall into one of two categories: chaining or terminating.
@@ -76,7 +76,7 @@ terminating method is called.
 | `Skip` | Skips over the parameter `skipNumber` number of values and effectively removes them from the chain.  Also skips over any errors previously generated. |
 | `Limit` | Stops the chain after the parameter `keepSize` number of values.  Any elements afterward are effectively removed. |
 | `Distinct` | Removes any duplicates. |
-| `Flatten` | Will iterate over all the values in the chain, but any value encountered that is a range-able container itself will also have its values iterated over first before continuing with the remaining values in the chain.  Maps flatten to its `generator.MapTuple` key and value pairs. |
+| `Flatten` | Will iterate over all the values in the chain, but any value encountered that is a range-able container itself will also have its values iterated over first before continuing with the remaining values in the chain.  Maps flatten to its `keyvalue.KeyValuer` key and value pairs. |
 | `Sort` | Sorts the chain given the `Less` function returned from the `returnLessFunction` function parameter.  The `returnLessFunction` function is called with the entire serialized chain as a slice and _returns_ a function that satisfies the same requirements as the [Interface type's](https://pkg.go.dev/sort#Interface) `Less` function.  See the [`TestSortingMaps` example](./example_test.go).  This method is expensive because it must serialize all the values into a slice first. |
 | `Reverse` | Reverses the order of the chain.  The last item will be first, and the first item will be last.  This method is expensive because it must serialize all the values into a slice first. |
 

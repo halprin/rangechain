@@ -2,7 +2,7 @@ package rangechain
 
 import (
 	"fmt"
-	"github.com/halprin/rangechain/generator"
+	"github.com/halprin/rangechain/keyvalue"
 	"testing"
 )
 
@@ -60,17 +60,17 @@ func TestSortingMaps(t *testing.T) {
 	chain := FromMap(aMap)
 	sortedAppleStuff, _ := chain.Sort(func(mapValuesToSort []interface{}) func(int, int) bool {
 		return func(index1 int, index2 int) bool {
-			mapValue1 := mapValuesToSort[index1].(generator.MapTuple)
-			mapValue2 := mapValuesToSort[index2].(generator.MapTuple)
+			mapValue1 := mapValuesToSort[index1].(keyvalue.KeyValuer)
+			mapValue2 := mapValuesToSort[index2].(keyvalue.KeyValuer)
 
-			rating1 := mapValue1.Value.(int)
-			rating2 := mapValue2.Value.(int)
+			rating1 := mapValue1.Value().(int)
+			rating2 := mapValue2.Value().(int)
 
 			return rating1 > rating2
 		}
 	}).Map(func(value interface{}) (interface{}, error) {
-		mapValue := value.(generator.MapTuple)
-		return mapValue.Key, nil
+		mapValue := value.(keyvalue.KeyValuer)
+		return mapValue.Key(), nil
 	}).Slice()
 
 	fmt.Println(sortedAppleStuff)
