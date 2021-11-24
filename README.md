@@ -1,4 +1,7 @@
 # rangechain
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/halprin/rangechain.svg)](https://pkg.go.dev/github.com/halprin/rangechain)
+
 Chain together lazily computed modifications to range-able containers.
 E.g. slices, arrays, maps, and channels.
 
