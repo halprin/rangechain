@@ -8,11 +8,25 @@ import (
 )
 
 // Map will run the `mapFunction` parameter function parameter against all the values in the chain.  In that function, return what you want to change the value into or an optional error if an error is encountered.
-func (receiver *Link) Map(mapFunction func(interface{}) (interface{}, error)) *Link {
+func (receiver *Link[T]) Map(mapFunction func(T) (interface{}, error)) *Link {
 	mapGenerator := func() (interface{}, error) {
 		valueToMap, err := receiver.generator()
 		if err != nil {
 			return 0, err
+		}
+
+		return mapFunction(valueToMap)
+	}
+
+	return newLink(mapGenerator)
+}
+
+func MapFunction[T any, S any](link *Link[T], mapFunction func(T) (S, error)) *Link[S] {
+	mapGenerator := func() (S, error) {
+		valueToMap, err := link.generator()
+		if err != nil {
+			var zeroReturnValue S
+			return zeroReturnValue, err
 		}
 
 		return mapFunction(valueToMap)
@@ -174,7 +188,7 @@ func (receiver *Link) Reverse() *Link {
 		return newLink(generation)
 	}
 
-	for startIndex, endIndex := 0, len(serializedSlice) - 1; startIndex <= endIndex; startIndex, endIndex = startIndex + 1, endIndex - 1 {
+	for startIndex, endIndex := 0, len(serializedSlice)-1; startIndex <= endIndex; startIndex, endIndex = startIndex+1, endIndex-1 {
 		serializedSlice[startIndex], serializedSlice[endIndex] = serializedSlice[endIndex], serializedSlice[startIndex]
 	}
 
