@@ -11,12 +11,20 @@ import (
 var Exhausted = errors.New("generator exhausted")
 
 // FromSlice creates a generator for a slice.
-func FromSlice(slice interface{}) func() (interface{}, error) {
-	if !helper.IsSlice(slice) {
-		panic("non-slice type provided")
-	}
+func FromSlice[T any](slice []T) func() (T, error) {
+	currentIndex := 0
 
-	return generatorFromSliceOrArray(slice)
+	return func() (T, error) {
+		if currentIndex >= len(slice) {
+			var zeroTValue T
+			return zeroTValue, Exhausted
+		}
+
+		value := slice[currentIndex]
+		currentIndex++
+
+		return value, nil
+	}
 }
 
 // FromArray creates a generator for an array.
@@ -25,7 +33,7 @@ func FromArray(array interface{}) func() (interface{}, error) {
 		panic("non-array type provided")
 	}
 
-	return generatorFromSliceOrArray(array)
+	return generatorFromArray(array)
 }
 
 // FromChannel creates a generator for a channel.
@@ -72,7 +80,7 @@ func FromMap(aMap interface{}) func() (interface{}, error) {
 	}
 }
 
-func generatorFromSliceOrArray(sliceOrArray interface{}) func() (interface{}, error) {
+func generatorFromArray(sliceOrArray interface{}) func() (interface{}, error) {
 	concreteValue := reflect.ValueOf(sliceOrArray)
 
 	currentIndex := 0
