@@ -36,13 +36,14 @@ func MapFunction[T any, S any](link *Link[T], mapFunction func(T) (S, error)) *L
 }
 
 // Filter will run the `filterFunction` parameter function against all the values in the chain.  In that function, on return of true, the value will stay, or on false, the value will be removed.
-func (receiver *Link) Filter(filterFunction func(interface{}) (bool, error)) *Link {
-	filterGenerator := func() (interface{}, error) {
+func (receiver *Link[T]) Filter(filterFunction func(T) (bool, error)) *Link[T] {
+	filterGenerator := func() (T, error) {
 		//go through the generator until you find an item that stays
 		for {
 			valueToFilter, err := receiver.generator()
 			if err != nil {
-				return 0, err
+				var zeroReturnValue T
+				return zeroReturnValue, err
 			}
 
 			valueStays, err := filterFunction(valueToFilter)
@@ -59,7 +60,7 @@ func (receiver *Link) Filter(filterFunction func(interface{}) (bool, error)) *Li
 }
 
 // Skip skips over the parameter `skipNumber` number of values and effectively removes them from the chain.  Also skips over any errors previously generated.
-func (receiver *Link) Skip(skipNumber int) *Link {
+func (receiver *Link[T]) Skip(skipNumber int) *Link[T] {
 	for count := 0; count < skipNumber; count++ {
 		_, _ = receiver.generator()
 	}
@@ -68,17 +69,19 @@ func (receiver *Link) Skip(skipNumber int) *Link {
 }
 
 // Limit stops the chain after the parameter `keepSize` number of values.  Any elements afterward are effectively removed.
-func (receiver *Link) Limit(keepSize int) *Link {
+func (receiver *Link[T]) Limit(keepSize int) *Link[T] {
 	itemsSeen := 0
 
-	limitGenerator := func() (interface{}, error) {
+	limitGenerator := func() (T, error) {
 		if itemsSeen >= keepSize {
-			return 0, generator.Exhausted
+			var zeroReturnValue T
+			return zeroReturnValue, generator.Exhausted
 		}
 
 		currentValue, err := receiver.generator()
 		if err != nil {
-			return 0, err
+			var zeroReturnValue T
+			return zeroReturnValue, err
 		}
 
 		itemsSeen++
@@ -90,15 +93,16 @@ func (receiver *Link) Limit(keepSize int) *Link {
 }
 
 // Distinct removes any duplicates.
-func (receiver *Link) Distinct() *Link {
+func (receiver *Link[T]) Distinct() *Link[T] {
 	seenTracker := helper.NewSet()
 
-	distinctGenerator := func() (interface{}, error) {
+	distinctGenerator := func() (T, error) {
 		//go through the generator until you find an item that hasn't been seen yet
 		for {
 			valueToDistinct, err := receiver.generator()
 			if err != nil {
-				return 0, err
+				var zeroReturnValue T
+				return zeroReturnValue, err
 			}
 
 			if !seenTracker.Contains(valueToDistinct) {
@@ -156,14 +160,64 @@ func (receiver *Link) Flatten() *Link {
 	return newLink(flattenGenerator)
 }
 
+type Rangeable[T ~comparable, S any] interface {
+	[]T | chan T | map[T]S
+}
+
+func FlattenFunction[T []S, S any](receiver *Link[T]) *Link[S] {
+	var currentGenerator func() (S, error)
+
+	flattenGenerator := func() (S, error) {
+		var innerValue S
+		var err error
+
+		for innerValue == nil {
+			if currentGenerator == nil {
+				var currentValue T
+				currentValue, err = receiver.generator()
+				if err != nil {
+					var zeroReturnValue S
+					return zeroReturnValue, err
+				}
+
+				if helper.IsSlice(currentValue) {
+					currentGenerator = generator.FromSlice[S](currentValue)
+				} else if helper.IsArray(currentValue) {
+					currentGenerator = generator.FromArray(currentValue)
+				} else if helper.IsChannel(currentValue) {
+					currentGenerator = generator.FromChannel(currentValue)
+				} else if helper.IsMap(currentValue) {
+					currentGenerator = generator.FromMap(currentValue)
+				} else {
+					//it's some basic value, just return that
+					innerValue = currentValue
+					break
+				}
+			}
+
+			innerValue, err = currentGenerator()
+			if errors.Is(err, generator.Exhausted) {
+				//the current generator is exhausted, set it to nil so we grab the next generator
+				innerValue = nil
+				currentGenerator = nil
+			}
+		}
+
+		return innerValue, err
+	}
+
+	return newLink(flattenGenerator)
+}
+
 // Sort sorts the chain given the `Less` function returned from the `returnLessFunction` function parameter.  The `returnLessFunction` function is called with the entire serialized chain as a slice and _returns_ a function that satisfies the same requirements as the Interface type's `Less` function (https://pkg.go.dev/sort#Interface).  This method is expensive because it must serialize all the values into a slice first.
-func (receiver *Link) Sort(returnLessFunction func([]interface{}) func(int, int) bool) *Link {
+func (receiver *Link[T]) Sort(returnLessFunction func([]T) func(int, int) bool) *Link[T] {
 	serializedSlice, err := receiver.Slice()
 	if err != nil {
 		//there was an error during serialization, so no need to do the work of sorting
 		//just always return the error that occurred
-		generation := func() (interface{}, error) {
-			return 0, err
+		generation := func() (T, error) {
+			var zeroReturnValue T
+			return zeroReturnValue, err
 		}
 		return newLink(generation)
 	}
@@ -177,13 +231,14 @@ func (receiver *Link) Sort(returnLessFunction func([]interface{}) func(int, int)
 }
 
 // Reverse reverses the order of the chain.  The last item will be first, and the first item will be last.  This method is expensive because it must serialize all the values into a slice first.
-func (receiver *Link) Reverse() *Link {
+func (receiver *Link[T]) Reverse() *Link[T] {
 	serializedSlice, err := receiver.Slice()
 	if err != nil {
 		//there was an error during serialization, so no need to do the work of reversing
 		//just always return the error that occurred
-		generation := func() (interface{}, error) {
-			return 0, err
+		generation := func() (T, error) {
+			var zeroReturnValue T
+			return zeroReturnValue, err
 		}
 		return newLink(generation)
 	}

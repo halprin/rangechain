@@ -6,8 +6,8 @@ import (
 )
 
 // Slice serializes the chain into a slice and returns it.  Also returns an error if any previous chain method generated an error.  If an error is returned, the slice is filled in until the error was encountered.
-func (receiver *Link) Slice() ([]interface{}, error) {
-	endSlice := []interface{}{}
+func (receiver *Link[T]) Slice() ([]T, error) {
+	endSlice := []T{}
 
 	for {
 		currentValue, err := receiver.generator()
@@ -52,7 +52,7 @@ func (receiver *Link) Channel() (<-chan interface{}, <-chan error) {
 }
 
 // ForEach will run the `forEachFunction` parameter function across all the values in the chain.  Also returns an error if any previous chain method generated an error.  If an error is encountered, the function stops executing against the remaining chain.
-func (receiver *Link) ForEach(forEachFunction func(interface{})) error {
+func (receiver *Link[T]) ForEach(forEachFunction func(T)) error {
 	for {
 		currentValue, err := receiver.generator()
 		if err != nil {
@@ -67,9 +67,8 @@ func (receiver *Link) ForEach(forEachFunction func(interface{})) error {
 	}
 }
 
-
 // ForEachParallel will run the `forEachFunction` parameter function across all the values in the chain in parallel.  Also returns an error if any previous chain method generated an error.  If an error is encountered, the function stops executing against the remaining chain.  There is overhead to running in parallel so benchmark to ensure you benefit from this version.
-func (receiver *Link) ForEachParallel(forEachFunction func(interface{})) error {
+func (receiver *Link[T]) ForEachParallel(forEachFunction func(T)) error {
 	for {
 		currentValue, err := receiver.generator()
 		if err != nil {
@@ -85,7 +84,7 @@ func (receiver *Link) ForEachParallel(forEachFunction func(interface{})) error {
 }
 
 // Count returns the number of values in the chain.  Also returns an error if any previous chain method generated an error.  Count returns an accurate number even if an error is encountered.
-func (receiver *Link) Count() (int, error) {
+func (receiver *Link[T]) Count() (int, error) {
 	count := 0
 	var firstError error
 	for {
@@ -105,7 +104,7 @@ func (receiver *Link) Count() (int, error) {
 }
 
 // First returns just a pointer to the first value in the chain.  If the chain is empty, returns `nil`.  Also returns an error if any previous chain method generated an error that affects the first value.
-func (receiver *Link) First() (*interface{}, error) {
+func (receiver *Link[T]) First() (*T, error) {
 	value, err := receiver.generator()
 	if err != nil {
 		if errors.Is(err, generator.Exhausted) {
@@ -119,8 +118,8 @@ func (receiver *Link) First() (*interface{}, error) {
 }
 
 // Last returns just a pointer to the last value in the chain.  If the chain is empty, returns `nil`.  Also returns an error if any previous chain method generated an error that affects the last value.
-func (receiver *Link) Last() (*interface{}, error) {
-	var lastValue *interface{}
+func (receiver *Link[T]) Last() (*T, error) {
+	var lastValue *T
 	var lastError error
 
 	for {
@@ -135,7 +134,7 @@ func (receiver *Link) Last() (*interface{}, error) {
 }
 
 // AllMatch will run the `allMatchFunction` parameter function across all the values in the chain.  If every `allMatchFunction` function invocation returns true, this method returns true.  If a single `allMatchFunction` function invocation returns false, this method returns false.  Also returns false and an error if any previous chain method generated an error or if an error is returned from the `allMatchFunction` function.
-func (receiver *Link) AllMatch(allMatchFunction func(interface{}) (bool, error)) (bool, error) {
+func (receiver *Link[T]) AllMatch(allMatchFunction func(T) (bool, error)) (bool, error) {
 	for {
 		currentValue, err := receiver.generator()
 		if err != nil {
@@ -156,7 +155,7 @@ func (receiver *Link) AllMatch(allMatchFunction func(interface{}) (bool, error))
 }
 
 // AnyMatch will run the `anyMatchFunction` parameter function across all the values in the chain.  If any `anyMatchFunction` function invocation returns true, this method returns true.  If every invocation `anyMatchFunction` invocation returns false, this method returns false.   Also returns false and an error if any previous chain method generated an error or if an error is returned from the `anyMatchFunction` function.
-func (receiver *Link) AnyMatch(anyMatchFunction func(interface{}) (bool, error)) (bool, error) {
+func (receiver *Link[T]) AnyMatch(anyMatchFunction func(T) (bool, error)) (bool, error) {
 	for {
 		currentValue, err := receiver.generator()
 		if err != nil {
@@ -179,7 +178,7 @@ func (receiver *Link) AnyMatch(anyMatchFunction func(interface{}) (bool, error))
 }
 
 // NoneMatch will do the exact opposite of `AnyMatch` when it comes to the boolean return value.  Returns an error for the same reasons as `AnyMatch`.
-func (receiver *Link) NoneMatch(noneMatchFunction func(interface{}) (bool, error)) (bool, error) {
+func (receiver *Link[T]) NoneMatch(noneMatchFunction func(T) (bool, error)) (bool, error) {
 	match, err := receiver.AnyMatch(noneMatchFunction)
 	return !match, err
 }
