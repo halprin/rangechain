@@ -22,14 +22,29 @@ func BenchmarkIntermediate1000(b *testing.B) {
 	benchmarkIntermediate(b, size1000Slice)
 }
 
+func BenchmarkForLoop1000(b *testing.B) {
+	for runIndex := 0; runIndex < b.N; runIndex++ {
+		var endingSlice []int
+
+		for value, _ := range size1000Slice {
+			if value%2 != 0 {
+				break
+			}
+
+			mappedValue := value*2 + 2
+			endingSlice = append(endingSlice, mappedValue)
+		}
+	}
+}
+
 func BenchmarkFlatten1000(b *testing.B) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
 		FromSlice(sliceOfSlice).Flatten().Filter(func(value interface{}) (bool, error) {
 			intValue := value.(int)
-			return intValue % 2 == 0, nil
+			return intValue%2 == 0, nil
 		}).Map(func(value interface{}) (interface{}, error) {
 			intValue := value.(int)
-			return intValue * 2 + 2, nil
+			return intValue*2 + 2, nil
 		}).Slice()
 	}
 }
@@ -66,10 +81,10 @@ func benchmarkIntermediate(b *testing.B, inputSlice []int) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
 		FromSlice(inputSlice).Filter(func(value interface{}) (bool, error) {
 			intValue := value.(int)
-			return intValue % 2 == 0, nil
+			return intValue%2 == 0, nil
 		}).Map(func(value interface{}) (interface{}, error) {
 			intValue := value.(int)
-			return intValue * 2 + 2, nil
+			return intValue*2 + 2, nil
 		}).Slice()
 	}
 }
