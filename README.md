@@ -29,12 +29,13 @@ container := []int{987, 3, 26}
 chain := rangechain.FromSlice(container)
 ```
 
-| Function | Arguments | Description |
-| --- | --- | --- |
-| `FromSlice` | • `slice` - A slice to be used to start the chain. | Starts the chain with the supplied slice.  Chaining and terminating methods can now be called on the result. |
-| `FromArray` | • `array` - An array to be used to start the chain. | Starts the chain with the supplied array.  Chaining and terminating methods can now be called on the result. |
-| `FromChannel` | • `channel` - A channel to be used to start the chain. | Starts the chain with the supplied channel.  Chaining and terminating methods can now be called on the result. |
-| `FromMap` | • `aMap` - A map to be used to start the chain. | Starts the chain with the supplied map.  Chaining and terminating methods can now be called on the result.  The singular value used to represent the key and value pairs is `keyvalue.KeyValuer` of `github.com/halprin/rangechain/keyvalue`. |
+| Function       | Arguments                                                        | Description                                                                                                                                                                                                                                   |
+|----------------|------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `FromSlice`    | • `slice` - A slice to be used to start the chain.               | Starts the chain with the supplied slice.  Chaining and terminating methods can now be called on the result.                                                                                                                                  |
+| `FromArray`    | • `array` - An array to be used to start the chain.              | Starts the chain with the supplied array.  Chaining and terminating methods can now be called on the result.                                                                                                                                  |
+| `FromChannel`  | • `channel` - A channel to be used to start the chain.           | Starts the chain with the supplied channel.  Chaining and terminating methods can now be called on the result.                                                                                                                                |
+| `FromMap`      | • `aMap` - A map to be used to start the chain.                  | Starts the chain with the supplied map.  Chaining and terminating methods can now be called on the result.  The singular value used to represent the key and value pairs is `keyvalue.KeyValuer` of `github.com/halprin/rangechain/keyvalue`. |
+| `FromIterator` | • `anIterator` - An `iter.Seq[T]` to be used to start the chain. | Starts the chain with the supplied iterator.  Chaining and terminating methods can now be called on the result.                                                                                                                               |
 
 From there, one can call a plethora of additional methods to modify the container passed in originally.  The methods are
 outlined below.  The methods fall into one of two categories: chaining or terminating.

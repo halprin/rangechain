@@ -2,6 +2,7 @@ package generator
 
 import (
 	"github.com/stretchr/testify/assert"
+	"slices"
 	"testing"
 )
 
@@ -120,7 +121,7 @@ func TestMapNotPanicsGivenMap(t *testing.T) {
 	assert.NotPanics(t, func() {
 		FromMap(map[string]int{
 			"DogCow": 1,
-			"Moof": 1976,
+			"Moof":   1976,
 		})
 	})
 }
@@ -143,6 +144,28 @@ func TestMapEndsWithError(t *testing.T) {
 
 	_, err = generator()
 	assert.ErrorIs(err, Exhausted)
+}
+
+func TestFromIteratorWithLastTimeError(t *testing.T) {
+	assert := assert.New(t)
+
+	generator := FromIterator(slices.Values([]interface{}{9}))
+
+	_, err := generator()
+
+	assert.NoError(err)
+
+	_, err = generator()
+
+	assert.ErrorIs(err, Exhausted)
+}
+
+func TestFromIteratorEmpty(t *testing.T) {
+	generator := FromIterator(slices.Values([]interface{}{}))
+
+	_, err := generator()
+
+	assert.ErrorIs(t, err, Exhausted)
 }
 
 func createTestChannel(size int) chan interface{} {

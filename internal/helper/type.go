@@ -1,6 +1,8 @@
 package helper
 
-import "reflect"
+import (
+	"reflect"
+)
 
 func IsSlice(value interface{}) bool {
 	concreteValue := reflect.ValueOf(value)
