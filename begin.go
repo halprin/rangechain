@@ -25,7 +25,7 @@ func FromArray(array interface{}) *Link {
 
 // FromChannel starts the chain with the supplied channel.
 // Chaining and terminating methods can now be called on the result.
-func FromChannel(channel interface{}) *Link {
+func FromChannel[T any](channel chan T) *Link {
 	channelGenerator := generator.FromChannel(channel)
 
 	link := newLink(channelGenerator)

@@ -50,12 +50,6 @@ func TestFromSliceEmpty(t *testing.T) {
 	assert.ErrorIs(t, err, Exhausted)
 }
 
-//func TestArrayDoesntWorkForSlice(t *testing.T) {
-//	assert.Panics(t, func() {
-//		FromSlice([...]interface{}{})
-//	})
-//}
-
 func TestArrayNotPanicsGivenArray(t *testing.T) {
 	assert.NotPanics(t, func() {
 		FromArray([...]interface{}{})
@@ -71,12 +65,6 @@ func TestArrayDoesntWorkGivenSlice(t *testing.T) {
 func TestChannelNotPanicsGivenChannel(t *testing.T) {
 	assert.NotPanics(t, func() {
 		FromChannel(createTestChannel(2))
-	})
-}
-
-func TestChannelDoesntWorkGivenSlice(t *testing.T) {
-	assert.Panics(t, func() {
-		FromChannel([]interface{}{})
 	})
 }
 

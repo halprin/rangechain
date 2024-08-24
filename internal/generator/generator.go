@@ -26,11 +26,7 @@ func FromArray(array interface{}) func() (interface{}, error) {
 }
 
 // FromChannel creates a generator for a channel.
-func FromChannel(channel interface{}) func() (interface{}, error) {
-	if !helper.IsChannel(channel) {
-		panic("non-channel type provided")
-	}
-
+func FromChannel[T any](channel chan T) func() (interface{}, error) {
 	concreteValue := reflect.ValueOf(channel)
 
 	return func() (interface{}, error) {
