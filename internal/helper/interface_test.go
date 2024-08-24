@@ -25,3 +25,28 @@ func TestInterfaceSliceReturnsNil(t *testing.T) {
 
 	assert.Nil(t, actualSlice)
 }
+
+func TestInterfaceMapConversion(t *testing.T) {
+	inputMap := map[int]string{3: "DogCow", 26: "Moof", 1337: "Clarus"}
+	actualMap := InterfaceMap(inputMap)
+
+	assert.Len(t, actualMap, len(inputMap))
+
+	for key, value := range inputMap {
+		assert.Equal(t, value, actualMap[key])
+	}
+}
+
+func TestInterfaceMapPanicsForNonSlice(t *testing.T) {
+	assert.Panics(t, func() {
+		InterfaceMap(3)
+	})
+}
+
+func TestInterfaceMapReturnsNil(t *testing.T) {
+	var inputMap map[int]string
+
+	actualMap := InterfaceMap(inputMap)
+
+	assert.Nil(t, actualMap)
+}

@@ -21,3 +21,23 @@ func InterfaceSlice(slice interface{}) []interface{} {
 
 	return interfaceSlice
 }
+
+func InterfaceMap(aMap interface{}) map[interface{}]interface{} {
+	if !IsMap(aMap) {
+		panic("non-map type provided")
+	}
+
+	concreteValue := reflect.ValueOf(aMap)
+
+	if concreteValue.IsNil() {
+		return nil
+	}
+
+	interfaceMap := make(map[interface{}]interface{}, concreteValue.Len())
+
+	for _, key := range concreteValue.MapKeys() {
+		interfaceMap[key.Interface()] = concreteValue.MapIndex(key).Interface()
+	}
+
+	return interfaceMap
+}

@@ -167,111 +167,111 @@ func TestDistinct(t *testing.T) {
 	assert.Nil(err)
 }
 
-//func TestFlattenWithSliceOfSlice(t *testing.T) {
-//	assert := assert.New(t)
-//
-//	inputSlice := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
-//	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 5, 6, 7, 8, 9})
-//	generation := generator.FromSlice(inputSlice)
-//	link := newLink(generation)
-//
-//	actualSlice, err := link.Flatten().Slice()
-//
-//	assert.Equal(expectedSlice, actualSlice)
-//	assert.Nil(err)
-//}
+func TestFlattenWithSliceOfSlice(t *testing.T) {
+	assert := assert.New(t)
 
-//func TestFlattenWithSliceMix(t *testing.T) {
-//	assert := assert.New(t)
-//
-//	inputSlice := []interface{}{[]int{1, 2, 3}, 4, []int{7, 8, 9}}
-//	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 7, 8, 9})
-//	generation := generator.FromSlice(inputSlice)
-//	link := newLink(generation)
-//
-//	actualSlice, err := link.Flatten().Slice()
-//
-//	assert.Equal(expectedSlice, actualSlice)
-//	assert.Nil(err)
-//}
+	inputSlice := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
+	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 5, 6, 7, 8, 9})
+	generation := generator.FromSlice(inputSlice)
+	link := newLink(generation)
 
-//func TestFlattenWithArray(t *testing.T) {
-//	assert := assert.New(t)
-//
-//	inputSlice := []interface{}{[...]int{1, 2, 3}, 4, [...]int{7, 8, 9}}
-//	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 7, 8, 9})
-//	generation := generator.FromSlice(inputSlice)
-//	link := newLink(generation)
-//
-//	actualSlice, err := link.Flatten().Slice()
-//
-//	assert.Equal(expectedSlice, actualSlice)
-//	assert.Nil(err)
-//}
+	actualSlice, err := link.Flatten().Slice()
 
-//func TestFlattenWithChannel(t *testing.T) {
-//	assert := assert.New(t)
-//
-//	firstChannel := createTestIntChannel([]int{1, 2, 3})
-//	secondChannel := createTestIntChannel([]int{7, 8, 9})
-//
-//	inputSlice := []interface{}{firstChannel, 4, secondChannel}
-//	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 7, 8, 9})
-//	generation := generator.FromSlice(inputSlice)
-//	link := newLink(generation)
-//
-//	actualSlice, err := link.Flatten().Slice()
-//
-//	assert.Equal(expectedSlice, actualSlice)
-//	assert.Nil(err)
-//}
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
+}
 
-//func TestFlattenWithSliceAndMap(t *testing.T) {
-//	assert := assert.New(t)
-//
-//	key1 := 4
-//	value1 := 5
-//	key2 := 6
-//	value2 := 7
-//
-//	innerMap := map[int]int{
-//		key1: value1,
-//		key2: value2,
-//	}
-//	inputSlice := []interface{}{[]int{1, 2, 3}, innerMap, []int{7, 8, 9}}
-//	expectedSlice := []interface{}{
-//		1,
-//		2,
-//		3,
-//		&testKeyValue{
-//			TheKey:   key1,
-//			TheValue: value1,
-//		},
-//		&testKeyValue{
-//			TheKey:   key2,
-//			TheValue: value2,
-//		},
-//		7,
-//		8,
-//		9,
-//	}
-//
-//	generation := generator.FromSlice(inputSlice)
-//	link := newLink(generation)
-//
-//	actualSlice, err := link.Flatten().Slice()
-//
-//	//not testing the order of the entire expected slice because we are not guaranteed the order in which a map is iterated over
-//	assertEqualsBasedOnKeyValuerInterface(t, expectedSlice, actualSlice)
-//	assert.Nil(err)
-//	//test the order for the non-map flattened parts
-//	assert.Equal(expectedSlice[0], actualSlice[0])
-//	assert.Equal(expectedSlice[1], actualSlice[1])
-//	assert.Equal(expectedSlice[2], actualSlice[2])
-//	assert.Equal(expectedSlice[5], actualSlice[5])
-//	assert.Equal(expectedSlice[6], actualSlice[6])
-//	assert.Equal(expectedSlice[7], actualSlice[7])
-//}
+func TestFlattenWithSliceMix(t *testing.T) {
+	assert := assert.New(t)
+
+	inputSlice := []interface{}{[]int{1, 2, 3}, 4, []int{7, 8, 9}}
+	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 7, 8, 9})
+	generation := generator.FromSlice(inputSlice)
+	link := newLink(generation)
+
+	actualSlice, err := link.Flatten().Slice()
+
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
+}
+
+func TestFlattenWithArray(t *testing.T) {
+	assert := assert.New(t)
+
+	inputSlice := []interface{}{[...]int{1, 2, 3}, 4, [...]int{7, 8, 9}}
+	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 7, 8, 9})
+	generation := generator.FromSlice(inputSlice)
+	link := newLink(generation)
+
+	actualSlice, err := link.Flatten().Slice()
+
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
+}
+
+func TestFlattenWithChannel(t *testing.T) {
+	assert := assert.New(t)
+
+	firstChannel := createTestIntChannel([]int{1, 2, 3})
+	secondChannel := createTestIntChannel([]int{7, 8, 9})
+
+	inputSlice := []interface{}{firstChannel, 4, secondChannel}
+	expectedSlice := helper.InterfaceSlice([]int{1, 2, 3, 4, 7, 8, 9})
+	generation := generator.FromSlice(inputSlice)
+	link := newLink(generation)
+
+	actualSlice, err := link.Flatten().Slice()
+
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
+}
+
+func TestFlattenWithSliceAndMap(t *testing.T) {
+	assert := assert.New(t)
+
+	key1 := 4
+	value1 := 5
+	key2 := 6
+	value2 := 7
+
+	innerMap := map[int]int{
+		key1: value1,
+		key2: value2,
+	}
+	inputSlice := []interface{}{[]int{1, 2, 3}, innerMap, []int{7, 8, 9}}
+	expectedSlice := []interface{}{
+		1,
+		2,
+		3,
+		&testKeyValue{
+			TheKey:   key1,
+			TheValue: value1,
+		},
+		&testKeyValue{
+			TheKey:   key2,
+			TheValue: value2,
+		},
+		7,
+		8,
+		9,
+	}
+
+	generation := generator.FromSlice(inputSlice)
+	link := newLink(generation)
+
+	actualSlice, err := link.Flatten().Slice()
+
+	//not testing the order of the entire expected slice because we are not guaranteed the order in which a map is iterated over
+	assertEqualsBasedOnKeyValuerInterface(t, expectedSlice, actualSlice)
+	assert.Nil(err)
+	//test the order for the non-map flattened parts
+	assert.Equal(expectedSlice[0], actualSlice[0])
+	assert.Equal(expectedSlice[1], actualSlice[1])
+	assert.Equal(expectedSlice[2], actualSlice[2])
+	assert.Equal(expectedSlice[5], actualSlice[5])
+	assert.Equal(expectedSlice[6], actualSlice[6])
+	assert.Equal(expectedSlice[7], actualSlice[7])
+}
 
 func TestSort(t *testing.T) {
 	assert := assert.New(t)
