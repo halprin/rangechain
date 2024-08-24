@@ -114,12 +114,6 @@ func TestMapNotPanicsGivenMap(t *testing.T) {
 	})
 }
 
-func TestMapDoesntWorkGivenSlice(t *testing.T) {
-	assert.Panics(t, func() {
-		FromMap([]interface{}{})
-	})
-}
-
 func TestMapEndsWithError(t *testing.T) {
 	assert := assert.New(t)
 

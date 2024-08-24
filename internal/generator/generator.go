@@ -42,11 +42,7 @@ func FromChannel[T any](channel chan T) func() (interface{}, error) {
 }
 
 // FromMap creates a generator for a map.
-func FromMap(aMap interface{}) func() (interface{}, error) {
-	if !helper.IsMap(aMap) {
-		panic("non-map type provided")
-	}
-
+func FromMap[K comparable, V any](aMap map[K]V) func() (interface{}, error) {
 	concreteValue := reflect.ValueOf(aMap)
 	mapIterator := concreteValue.MapRange()
 

@@ -34,7 +34,7 @@ func FromChannel[T any](channel chan T) *Link {
 
 // FromMap starts the chain with the supplied map.
 // Chaining and terminating methods can now be called on the result.  The singular value used to represent the key and value pairs is `keyvalue.KeyValuer` of `github.com/halprin/rangechain/keyvalue`.
-func FromMap(aMap interface{}) *Link {
+func FromMap[K comparable, V any](aMap map[K]V) *Link {
 	mapGenerator := generator.FromMap(aMap)
 
 	link := newLink(mapGenerator)
