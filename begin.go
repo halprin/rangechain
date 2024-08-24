@@ -7,7 +7,7 @@ import (
 
 // FromSlice starts the chain with the supplied slice.
 // Chaining and terminating methods can now be called on the result.
-func FromSlice(slice interface{}) *Link {
+func FromSlice[T any](slice []T) *Link {
 	sliceGenerator := generator.FromSlice(slice)
 
 	link := newLink(sliceGenerator)

@@ -1,7 +1,6 @@
 package rangechain
 
 import (
-	"errors"
 	"github.com/halprin/rangechain/internal/generator"
 	"github.com/halprin/rangechain/internal/helper"
 	"sort"
@@ -98,49 +97,49 @@ func (receiver *Link) Distinct() *Link {
 }
 
 // Flatten will iterate over all the values in the chain, but any value encountered that is a range-able container itself will also have its values iterated over first before continuing with the remaining values in the chain.  Maps flatten to its `keyvalue.KeyValuer` key and value pairs.
-func (receiver *Link) Flatten() *Link {
-	var currentGenerator func() (interface{}, error)
-
-	flattenGenerator := func() (interface{}, error) {
-		var innerValue interface{}
-		var err error
-
-		for innerValue == nil {
-			if currentGenerator == nil {
-				var currentValue interface{}
-				currentValue, err = receiver.generator()
-				if err != nil {
-					return 0, err
-				}
-
-				if helper.IsSlice(currentValue) {
-					currentGenerator = generator.FromSlice(currentValue)
-				} else if helper.IsArray(currentValue) {
-					currentGenerator = generator.FromArray(currentValue)
-				} else if helper.IsChannel(currentValue) {
-					currentGenerator = generator.FromChannel(currentValue)
-				} else if helper.IsMap(currentValue) {
-					currentGenerator = generator.FromMap(currentValue)
-				} else {
-					//it's some basic value, just return that
-					innerValue = currentValue
-					break
-				}
-			}
-
-			innerValue, err = currentGenerator()
-			if errors.Is(err, generator.Exhausted) {
-				//the current generator is exhausted, set it to nil so we grab the next generator
-				innerValue = nil
-				currentGenerator = nil
-			}
-		}
-
-		return innerValue, err
-	}
-
-	return newLink(flattenGenerator)
-}
+//func (receiver *Link) Flatten() *Link {
+//	var currentGenerator func() (interface{}, error)
+//
+//	flattenGenerator := func() (interface{}, error) {
+//		var innerValue interface{}
+//		var err error
+//
+//		for innerValue == nil {
+//			if currentGenerator == nil {
+//				var currentValue interface{}
+//				currentValue, err = receiver.generator()
+//				if err != nil {
+//					return 0, err
+//				}
+//
+//				if helper.IsSlice(currentValue) {
+//					currentGenerator = generator.FromSlice(currentValue)
+//				} else if helper.IsArray(currentValue) {
+//					currentGenerator = generator.FromArray(currentValue)
+//				} else if helper.IsChannel(currentValue) {
+//					currentGenerator = generator.FromChannel(currentValue)
+//				} else if helper.IsMap(currentValue) {
+//					currentGenerator = generator.FromMap(currentValue)
+//				} else {
+//					//it's some basic value, just return that
+//					innerValue = currentValue
+//					break
+//				}
+//			}
+//
+//			innerValue, err = currentGenerator()
+//			if errors.Is(err, generator.Exhausted) {
+//				//the current generator is exhausted, set it to nil so we grab the next generator
+//				innerValue = nil
+//				currentGenerator = nil
+//			}
+//		}
+//
+//		return innerValue, err
+//	}
+//
+//	return newLink(flattenGenerator)
+//}
 
 // Sort sorts the chain given the `Less` function returned from the `returnLessFunction` function parameter.  The `returnLessFunction` function is called with the entire serialized chain as a slice and _returns_ a function that satisfies the same requirements as the Interface type's `Less` function (https://pkg.go.dev/sort#Interface).  This method is expensive because it must serialize all the values into a slice first.
 func (receiver *Link) Sort(returnLessFunction func([]interface{}) func(int, int) bool) *Link {
@@ -174,7 +173,7 @@ func (receiver *Link) Reverse() *Link {
 		return newLink(generation)
 	}
 
-	for startIndex, endIndex := 0, len(serializedSlice) - 1; startIndex <= endIndex; startIndex, endIndex = startIndex + 1, endIndex - 1 {
+	for startIndex, endIndex := 0, len(serializedSlice)-1; startIndex <= endIndex; startIndex, endIndex = startIndex+1, endIndex-1 {
 		serializedSlice[startIndex], serializedSlice[endIndex] = serializedSlice[endIndex], serializedSlice[startIndex]
 	}
 

@@ -12,11 +12,7 @@ import (
 var Exhausted = errors.New("generator exhausted")
 
 // FromSlice creates a generator for a slice.
-func FromSlice(slice interface{}) func() (interface{}, error) {
-	if !helper.IsSlice(slice) {
-		panic("non-slice type provided")
-	}
-
+func FromSlice[T any](slice []T) func() (interface{}, error) {
 	return generatorFromSliceOrArray(slice)
 }
 
