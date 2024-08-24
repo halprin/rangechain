@@ -2,6 +2,7 @@ package rangechain
 
 import (
 	"github.com/halprin/rangechain/internal/generator"
+	"iter"
 )
 
 // FromSlice starts the chain with the supplied slice.
@@ -37,5 +38,14 @@ func FromMap(aMap interface{}) *Link {
 	mapGenerator := generator.FromMap(aMap)
 
 	link := newLink(mapGenerator)
+	return link
+}
+
+// FromIterator starts the chain with the supplied iterator.
+// Chaining and terminating methods can now be called on the result.
+func FromIterator[T any](anIterator iter.Seq[T]) *Link {
+	iterGenerator := generator.FromIterator(anIterator)
+
+	link := newLink(iterGenerator)
 	return link
 }

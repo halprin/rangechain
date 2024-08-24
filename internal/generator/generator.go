@@ -4,6 +4,7 @@ package generator
 import (
 	"errors"
 	"github.com/halprin/rangechain/internal/helper"
+	"iter"
 	"reflect"
 )
 
@@ -69,6 +70,26 @@ func FromMap(aMap interface{}) func() (interface{}, error) {
 		}
 
 		return tuple, nil
+	}
+}
+
+func FromIterator[T any](anIterator iter.Seq[T]) func() (interface{}, error) {
+	//if !helper.IsIterator(anIterator) {
+	//	panic("non-iterator type provided")
+	//}
+	//
+	//sequence := anIterator.(iter.Seq[any])
+
+	next, stop := iter.Pull(anIterator)
+
+	return func() (interface{}, error) {
+		value, ok := next()
+		if !ok {
+			stop()
+			return 0, Exhausted
+		}
+
+		return value, nil
 	}
 }
 

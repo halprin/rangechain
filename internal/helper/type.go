@@ -1,6 +1,9 @@
 package helper
 
-import "reflect"
+import (
+	"iter"
+	"reflect"
+)
 
 func IsSlice(value interface{}) bool {
 	concreteValue := reflect.ValueOf(value)
@@ -20,4 +23,10 @@ func IsChannel(value interface{}) bool {
 func IsMap(value interface{}) bool {
 	concreteValue := reflect.ValueOf(value)
 	return concreteValue.Kind() == reflect.Map
+}
+
+func IsIterator(value interface{}) bool {
+	_, ok := value.(iter.Seq[any])
+
+	return ok
 }

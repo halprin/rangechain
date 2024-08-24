@@ -3,6 +3,7 @@ package rangechain
 import (
 	"github.com/halprin/rangechain/keyvalue"
 	"github.com/stretchr/testify/assert"
+	"slices"
 	"testing"
 )
 
@@ -78,6 +79,19 @@ func TestFromMap(t *testing.T) {
 	slice, err := chain.Slice()
 	//not testing the order because we are not guaranteed the order in which a map is iterated over
 	assertEqualsBasedOnKeyValuerInterface(t, expectedOutput, slice)
+	assert.Nil(err)
+}
+
+func TestFromIterator(t *testing.T) {
+	assert := assert.New(t)
+
+	inputSlice := []string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
+	inputIterator := slices.Values(inputSlice)
+	expectedOutput := []interface{}{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
+	chain := FromIterator(inputIterator)
+
+	slice, err := chain.Slice()
+	assert.Equal(expectedOutput, slice)
 	assert.Nil(err)
 }
 
