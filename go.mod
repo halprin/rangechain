@@ -2,7 +2,7 @@ module github.com/halprin/rangechain
 
 go 1.23
 
-toolchain go1.23.2
+toolchain go1.23.3
 
 require github.com/stretchr/testify v1.9.0
 
