@@ -2,37 +2,40 @@ package rangechain
 
 import (
 	"errors"
+	"fmt"
 	"github.com/halprin/rangechain/internal/generator"
 	"github.com/halprin/rangechain/internal/helper"
 	"reflect"
 )
 
-// Flatten will iterate over all the values in the chain, but any value encountered that is a range-able container itself will also have its values iterated over first before continuing with the remaining values in the chain.  Maps flatten to its `keyvalue.KeyValuer` key and value pairs.
+// Flatten will iterate over all the values in the chain, but any value encountered that is a range-able container itself will also have its values iterated over first before continuing with the remaining values in the chain.  Maps flatten to its `keyvalue.KeyValuer[any, any]` key and value pairs.
 //
-// Because Flatten requires the chain to hold heterogeneous container types, it is only available on `*Link[any]`.
-func Flatten(receiver *Link[any]) *Link[any] {
+// The caller specifies the output element type `U`.  Each emitted inner value (or scalar) is type-asserted to `U`; on mismatch, an error is injected into the chain at that point and downstream terminations propagate it.
+func (receiver *Link[T]) Flatten[U any]() *Link[U] {
 	var currentGenerator func() (any, error)
 
-	flattenGenerator := func() (any, error) {
+	flattenGenerator := func() (U, error) {
 		var innerValue any
 		var err error
 
 		for innerValue == nil {
 			if currentGenerator == nil {
-				var currentValue any
+				var currentValue T
 				currentValue, err = receiver.generator()
 				if err != nil {
-					return nil, err
+					var zero U
+					return zero, err
 				}
 
-				if helper.IsSlice(currentValue) || helper.IsArray(currentValue) {
-					currentGenerator = sliceOrArrayAnyGenerator(currentValue)
-				} else if helper.IsChannel(currentValue) {
-					currentGenerator = channelAnyGenerator(currentValue)
-				} else if helper.IsMap(currentValue) {
-					currentGenerator = mapAnyGenerator(currentValue)
+				currentAny := any(currentValue)
+				if helper.IsSlice(currentAny) || helper.IsArray(currentAny) {
+					currentGenerator = sliceOrArrayAnyGenerator(currentAny)
+				} else if helper.IsChannel(currentAny) {
+					currentGenerator = channelAnyGenerator(currentAny)
+				} else if helper.IsMap(currentAny) {
+					currentGenerator = mapAnyGenerator(currentAny)
 				} else {
-					innerValue = currentValue
+					innerValue = currentAny
 					break
 				}
 			}
@@ -44,10 +47,18 @@ func Flatten(receiver *Link[any]) *Link[any] {
 			}
 		}
 
-		return innerValue, err
+		return assertTo[U](innerValue)
 	}
 
 	return newLink(flattenGenerator)
+}
+
+func assertTo[U any](v any) (U, error) {
+	if casted, ok := v.(U); ok {
+		return casted, nil
+	}
+	var zero U
+	return zero, fmt.Errorf("flatten: element %v (type %T) is not assignable to %v", v, v, reflect.TypeFor[U]())
 }
 
 // sliceOrArrayAnyGenerator builds an any-typed generator over a slice or array of unknown element type, using reflection.

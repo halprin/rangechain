@@ -39,12 +39,10 @@ func BenchmarkForLoop1000(b *testing.B) {
 
 func BenchmarkFlatten1000(b *testing.B) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		Flatten(FromSlice(sliceOfSlice)).Filter(func(value any) (bool, error) {
-			intValue := value.(int)
-			return intValue%2 == 0, nil
-		}).Map(func(value any) (int, error) {
-			intValue := value.(int)
-			return intValue*2 + 2, nil
+		FromSlice(sliceOfSlice).Flatten[int]().Filter(func(value int) (bool, error) {
+			return value%2 == 0, nil
+		}).Map(func(value int) (int, error) {
+			return value*2 + 2, nil
 		}).Slice()
 	}
 }

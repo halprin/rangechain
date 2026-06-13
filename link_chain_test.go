@@ -167,7 +167,7 @@ func TestFlattenWithSliceOfSlice(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := newLink(generation)
 
-	actualSlice, err := Flatten(link).Slice()
+	actualSlice, err := link.Flatten[any]().Slice()
 
 	assert.Equal(expectedSlice, actualSlice)
 	assert.Nil(err)
@@ -181,7 +181,7 @@ func TestFlattenWithSliceMix(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := newLink(generation)
 
-	actualSlice, err := Flatten(link).Slice()
+	actualSlice, err := link.Flatten[any]().Slice()
 
 	assert.Equal(expectedSlice, actualSlice)
 	assert.Nil(err)
@@ -195,7 +195,7 @@ func TestFlattenWithArray(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := newLink(generation)
 
-	actualSlice, err := Flatten(link).Slice()
+	actualSlice, err := link.Flatten[any]().Slice()
 
 	assert.Equal(expectedSlice, actualSlice)
 	assert.Nil(err)
@@ -212,7 +212,7 @@ func TestFlattenWithChannel(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := newLink(generation)
 
-	actualSlice, err := Flatten(link).Slice()
+	actualSlice, err := link.Flatten[any]().Slice()
 
 	assert.Equal(expectedSlice, actualSlice)
 	assert.Nil(err)
@@ -235,7 +235,7 @@ func TestFlattenWithSliceAndMap(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := newLink(generation)
 
-	actualSlice, err := Flatten(link).Slice()
+	actualSlice, err := link.Flatten[any]().Slice()
 
 	assert.Nil(err)
 	assert.Len(actualSlice, 8)
@@ -256,6 +256,30 @@ func TestFlattenWithSliceAndMap(t *testing.T) {
 	}
 	assert.Equal(value1, seenKeys[key1])
 	assert.Equal(value2, seenKeys[key2])
+}
+
+func TestFlattenTypedInts(t *testing.T) {
+	assert := assert.New(t)
+
+	inputSlice := [][]int{{1, 2, 3}, {4, 5, 6}}
+	expectedSlice := []int{1, 2, 3, 4, 5, 6}
+
+	actualSlice, err := FromSlice(inputSlice).Flatten[int]().Slice()
+
+	assert.Equal(expectedSlice, actualSlice)
+	assert.Nil(err)
+}
+
+func TestFlattenTypedMismatchInjectsError(t *testing.T) {
+	assert := assert.New(t)
+
+	inputSlice := []any{[]int{1, 2}, "oops", []int{3}}
+
+	actualSlice, err := FromSlice(inputSlice).Flatten[int]().Slice()
+
+	assert.Equal([]int{1, 2}, actualSlice)
+	assert.NotNil(err)
+	assert.Contains(err.Error(), "not assignable to int")
 }
 
 func TestSort(t *testing.T) {

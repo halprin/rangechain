@@ -40,9 +40,10 @@
 //
 // # Flatten
 //
-// Flatten is inherently heterogeneous, so it is only available on *Link[any] and is exposed as a free function:
+// Flatten is a chainable generic method.  The caller specifies the output element type U; each emitted inner value is type-asserted to U, and a mismatch injects an error into the chain.
 //
-//	result, _ := rangechain.Flatten(rangechain.FromSlice([]any{
-//	    []int{1, 2, 3}, 4, []int{5, 6},
-//	})).Slice()
+//	result, _ := rangechain.FromSlice([][]int{{1, 2, 3}, {4, 5, 6}}).
+//	    Flatten[int]().Slice()
+//
+// Use Flatten[any]() for heterogeneous chains that mix containers and scalars.
 package rangechain

@@ -72,21 +72,28 @@ terminating method is called.
 | `Skip` | Skips the next `skipNumber` values (including any errors already in flight). |
 | `Limit` | Stops the chain after `keepSize` values have been emitted. |
 | `DistinctFunc[K comparable]` | Removes duplicates.  Two values whose `keyFunction` returns the same `K` are considered equal.  Use `func(v T) T { return v }` when `T` is itself comparable. |
+| `Flatten[U any]` | Iterates each chain value; any value that is itself a slice, array, channel, or map is descended into (maps emit `keyvalue.KeyValuer[any, any]` entries).  Each emitted inner value is type-asserted to `U`; a mismatch injects an error into the chain at that point. |
 | `Sort` | Sorts the chain using a `Less` function returned by `returnLessFunction`.  The returned function operates against the serialized `[]T`.  Expensive because it serializes the chain first. |
 | `Reverse` | Reverses the order of the chain.  Expensive because it serializes the chain first. |
 
-#### Flatten (untyped chains)
+#### Flatten examples
 
-`Flatten` is inherently heterogeneous — it needs to mix containers and scalar values — so it is only available on `*Link[any]` and is exposed as a free function:
+Homogeneous case — caller knows the inner element type:
 
 ```go
-result, _ := rangechain.Flatten(rangechain.FromSlice([]any{
-    []int{1, 2, 3}, 4, []int{5, 6},
-})).Slice()
-// result == []any{1, 2, 3, 4, 5, 6}
+result, _ := rangechain.FromSlice([][]int{{1, 2, 3}, {4, 5, 6}}).
+    Flatten[int]().Slice()
+// result == []int{1, 2, 3, 4, 5, 6}
 ```
 
-Maps flatten to `keyvalue.KeyValuer[any, any]` entries.
+Heterogeneous case — mix containers and scalars, use `Flatten[any]()`:
+
+```go
+result, _ := rangechain.FromSlice([]any{
+    []int{1, 2, 3}, 4, []int{5, 6},
+}).Flatten[any]().Slice()
+// result == []any{1, 2, 3, 4, 5, 6}
+```
 
 ### Terminating the Chain
 
