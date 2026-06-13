@@ -3,25 +3,25 @@ package rangechain
 import "github.com/halprin/rangechain/internal/generator"
 
 // MapParallel will run the `mapFunction` parameter function against all the values in the chain in parallel.  In that function, return what you want to change the value into or an optional error if an error is encountered.  There is overhead to running in parallel so benchmark to ensure you benefit from this version.
-func (receiver *Link) MapParallel(mapFunction func(interface{}) (interface{}, error)) *Link {
+func (receiver *Link[T]) MapParallel[U any](mapFunction func(T) (U, error)) *Link[U] {
 	computedValues := false
-	var mappedReturnValues []chan interface{}
+	var mappedReturnValues []chan U
 	var mappedErrorValues []chan error
 	currentIndex := 0
 
-	mapGenerator := func() (interface{}, error) {
+	mapGenerator := func() (U, error) {
 		if !computedValues {
-			//run the map function against all the items in the generator on the first call to this generator
 			mappedReturnValues, mappedErrorValues = mapFunctionAgainstEntireGenerator(receiver.generator, mapFunction)
 			computedValues = true
 		}
 
 		if currentIndex >= len(mappedReturnValues) {
-			return 0, generator.Exhausted
+			var zero U
+			return zero, generator.Exhausted
 		}
 
-		value := <- mappedReturnValues[currentIndex]
-		err := <- mappedErrorValues[currentIndex]
+		value := <-mappedReturnValues[currentIndex]
+		err := <-mappedErrorValues[currentIndex]
 		currentIndex++
 
 		return value, err
@@ -30,8 +30,8 @@ func (receiver *Link) MapParallel(mapFunction func(interface{}) (interface{}, er
 	return newLink(mapGenerator)
 }
 
-func mapFunctionAgainstEntireGenerator(generatorToParallelize func() (interface{}, error), mapFunction func(interface{}) (interface{}, error)) ([]chan interface{}, []chan error) {
-	var mappedReturnValues []chan interface{}
+func mapFunctionAgainstEntireGenerator[T, U any](generatorToParallelize func() (T, error), mapFunction func(T) (U, error)) ([]chan U, []chan error) {
+	var mappedReturnValues []chan U
 	var mappedErrorValues []chan error
 
 	for {
@@ -40,7 +40,7 @@ func mapFunctionAgainstEntireGenerator(generatorToParallelize func() (interface{
 			break
 		}
 
-		mappedReturnValue := make(chan interface{})
+		mappedReturnValue := make(chan U)
 		mappedReturnValues = append(mappedReturnValues, mappedReturnValue)
 		mappedErrorValue := make(chan error)
 		mappedErrorValues = append(mappedErrorValues, mappedErrorValue)
@@ -51,7 +51,7 @@ func mapFunctionAgainstEntireGenerator(generatorToParallelize func() (interface{
 	return mappedReturnValues, mappedErrorValues
 }
 
-func pipeReturnAndErrorValueToChannels(mapFunction func(interface{}) (interface{}, error), valueToMap interface{}, returnValueChannel chan interface{}, returnErrorChannel chan error) {
+func pipeReturnAndErrorValueToChannels[T, U any](mapFunction func(T) (U, error), valueToMap T, returnValueChannel chan U, returnErrorChannel chan error) {
 	mappedValue, err := mapFunction(valueToMap)
 	returnValueChannel <- mappedValue
 	returnErrorChannel <- err
@@ -59,35 +59,38 @@ func pipeReturnAndErrorValueToChannels(mapFunction func(interface{}) (interface{
 	close(returnErrorChannel)
 }
 
+type filterResult[T any] struct {
+	value T
+	keep  bool
+}
+
 // FilterParallel will run the `filterFunction` parameter function against all the values in the chain in parallel.  In that function, on return of true, the value will stay in the chain, or on false, the value will be removed from the chain.  There is overhead to running in parallel so benchmark to ensure you benefit from this version.
-func (receiver *Link) FilterParallel(filterFunction func(interface{}) (bool, error)) *Link {
+func (receiver *Link[T]) FilterParallel(filterFunction func(T) (bool, error)) *Link[T] {
 	computedValues := false
-	var mappedReturnValues []chan interface{}
-	var mappedErrorValues []chan error
+	var resultChannels []chan filterResult[T]
+	var errorChannels []chan error
 	currentIndex := 0
 
-	filterGenerator := func() (interface{}, error) {
+	filterGenerator := func() (T, error) {
 		if !computedValues {
-			//run the map function against all the items in the generator on the first call to this generator
-			mappedReturnValues, mappedErrorValues = filterFunctionAgainstEntireGenerator(receiver.generator, filterFunction)
+			resultChannels, errorChannels = filterFunctionAgainstEntireGenerator(receiver.generator, filterFunction)
 			computedValues = true
 		}
 
-		//go through the return values until you find an item that stays
 		for {
-			if currentIndex >= len(mappedReturnValues) {
-				return 0, generator.Exhausted
+			if currentIndex >= len(resultChannels) {
+				var zero T
+				return zero, generator.Exhausted
 			}
 
-			value := <- mappedReturnValues[currentIndex]
-			valueStays := (<- mappedReturnValues[currentIndex]).(bool)
-			err := <- mappedErrorValues[currentIndex]
+			result := <-resultChannels[currentIndex]
+			err := <-errorChannels[currentIndex]
 			currentIndex++
 
 			if err != nil {
-				return value, err
-			} else if valueStays {
-				return value, nil
+				return result.value, err
+			} else if result.keep {
+				return result.value, nil
 			}
 		}
 	}
@@ -95,9 +98,9 @@ func (receiver *Link) FilterParallel(filterFunction func(interface{}) (bool, err
 	return newLink(filterGenerator)
 }
 
-func filterFunctionAgainstEntireGenerator(generatorToParallelize func() (interface{}, error), filterFunction func(interface{}) (bool, error)) ([]chan interface{}, []chan error) {
-	var mappedReturnValues []chan interface{}
-	var mappedErrorValues []chan error
+func filterFunctionAgainstEntireGenerator[T any](generatorToParallelize func() (T, error), filterFunction func(T) (bool, error)) ([]chan filterResult[T], []chan error) {
+	var resultChannels []chan filterResult[T]
+	var errorChannels []chan error
 
 	for {
 		valueToFilter, err := generatorToParallelize()
@@ -105,22 +108,21 @@ func filterFunctionAgainstEntireGenerator(generatorToParallelize func() (interfa
 			break
 		}
 
-		mappedReturnValue := make(chan interface{})
-		mappedReturnValues = append(mappedReturnValues, mappedReturnValue)
-		mappedErrorValue := make(chan error)
-		mappedErrorValues = append(mappedErrorValues, mappedErrorValue)
+		resultChannel := make(chan filterResult[T])
+		resultChannels = append(resultChannels, resultChannel)
+		errorChannel := make(chan error)
+		errorChannels = append(errorChannels, errorChannel)
 
-		go pipeInputValueAndReturnValueToChannel(filterFunction, valueToFilter, mappedReturnValue, mappedErrorValue)
+		go pipeFilterResultToChannel(filterFunction, valueToFilter, resultChannel, errorChannel)
 	}
 
-	return mappedReturnValues, mappedErrorValues
+	return resultChannels, errorChannels
 }
 
-func pipeInputValueAndReturnValueToChannel(filterFunction func(interface{}) (bool, error), valueToMap interface{}, returnValueChannel chan interface{}, returnErrorChannel chan error) {
-	filtered, err := filterFunction(valueToMap)
-	returnValueChannel <- valueToMap
-	returnValueChannel <- filtered
-	returnErrorChannel <- err
-	close(returnValueChannel)
-	close(returnErrorChannel)
+func pipeFilterResultToChannel[T any](filterFunction func(T) (bool, error), valueToFilter T, resultChannel chan filterResult[T], errorChannel chan error) {
+	keep, err := filterFunction(valueToFilter)
+	resultChannel <- filterResult[T]{value: valueToFilter, keep: keep}
+	errorChannel <- err
+	close(resultChannel)
+	close(errorChannel)
 }

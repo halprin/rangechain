@@ -8,7 +8,7 @@ import (
 func TestSet(t *testing.T) {
 	assert := assert.New(t)
 
-	aSet := NewSet()
+	aSet := NewSet[string]()
 	valueToCheck := "Moof!"
 
 	assert.False(aSet.Contains(valueToCheck))
