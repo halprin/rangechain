@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/halprin/rangechain/internal/generator"
-	"github.com/halprin/rangechain/internal/helper"
 	"reflect"
 )
 
@@ -28,11 +27,11 @@ func (receiver *Link[T]) Flatten[U any]() *Link[U] {
 				}
 
 				currentAny := any(currentValue)
-				if helper.IsSlice(currentAny) || helper.IsArray(currentAny) {
+				if isSlice(currentAny) || isArray(currentAny) {
 					currentGenerator = sliceOrArrayAnyGenerator(currentAny)
-				} else if helper.IsChannel(currentAny) {
+				} else if isChannel(currentAny) {
 					currentGenerator = channelAnyGenerator(currentAny)
-				} else if helper.IsMap(currentAny) {
+				} else if isMap(currentAny) {
 					currentGenerator = mapAnyGenerator(currentAny)
 				} else {
 					innerValue = currentAny
@@ -59,6 +58,22 @@ func assertTo[U any](v any) (U, error) {
 	}
 	var zero U
 	return zero, fmt.Errorf("flatten: element %v (type %T) is not assignable to %v", v, v, reflect.TypeFor[U]())
+}
+
+func isSlice(value any) bool {
+	return reflect.ValueOf(value).Kind() == reflect.Slice
+}
+
+func isArray(value any) bool {
+	return reflect.ValueOf(value).Kind() == reflect.Array
+}
+
+func isChannel(value any) bool {
+	return reflect.ValueOf(value).Kind() == reflect.Chan
+}
+
+func isMap(value any) bool {
+	return reflect.ValueOf(value).Kind() == reflect.Map
 }
 
 // sliceOrArrayAnyGenerator builds an any-typed generator over a slice or array of unknown element type, using reflection.
