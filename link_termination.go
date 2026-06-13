@@ -3,6 +3,7 @@ package rangechain
 import (
 	"errors"
 	"github.com/halprin/rangechain/internal/generator"
+	"iter"
 )
 
 // Slice serializes the chain into a slice and returns it.  Also returns an error if any previous chain method generated an error.  If an error is returned, the slice is filled in until the error was encountered.
@@ -47,6 +48,27 @@ func (receiver *Link[T]) Channel() (<-chan T, <-chan error) {
 	}()
 
 	return endChannel, errorChannel
+}
+
+// Iterator serializes the chain into an `iter.Seq2[T, error]` so it can be consumed with `range`.  Each value is yielded as `(value, nil)`.  If any previous chain method generated an error, the iterator yields `(zero, err)` once and then stops.
+func (receiver *Link[T]) Iterator() iter.Seq2[T, error] {
+	return func(yield func(T, error) bool) {
+		for {
+			currentValue, err := receiver.generator()
+			if err != nil {
+				if errors.Is(err, generator.Exhausted) {
+					return
+				}
+				var zero T
+				yield(zero, err)
+				return
+			}
+
+			if !yield(currentValue, nil) {
+				return
+			}
+		}
+	}
 }
 
 // ForEach will run the `forEachFunction` parameter function across all the values in the chain.  Also returns an error if any previous chain method generated an error.  If an error is encountered, the function stops executing against the remaining chain.

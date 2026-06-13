@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/halprin/rangechain/keyvalue"
 	"iter"
+	"maps"
 )
 
 // Exhausted is returned as an expected error from the generators to designate an end of the generator.
@@ -42,27 +43,19 @@ func FromChannel[T any](channel <-chan T) func() (T, error) {
 
 // FromMap creates a generator for a map.
 func FromMap[K comparable, V any](aMap map[K]V) func() (keyvalue.KeyValuer[K, V], error) {
-	keys := make([]K, 0, len(aMap))
-	for key := range aMap {
-		keys = append(keys, key)
-	}
-
-	currentIndex := 0
+	next, stop := iter.Pull2(maps.All(aMap))
 
 	return func() (keyvalue.KeyValuer[K, V], error) {
-		if currentIndex >= len(keys) {
+		key, value, ok := next()
+		if !ok {
+			stop()
 			return nil, Exhausted
 		}
 
-		key := keys[currentIndex]
-		currentIndex++
-
-		tuple := &mapTuple[K, V]{
+		return &mapTuple[K, V]{
 			TheKey:   key,
-			TheValue: aMap[key],
-		}
-
-		return tuple, nil
+			TheValue: value,
+		}, nil
 	}
 }
 

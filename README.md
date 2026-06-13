@@ -105,6 +105,7 @@ executed first.
 | --- | --- |
 | `Slice` | Serializes the chain into a `[]T` and returns it.  Also returns an error if any previous chain method generated one.  On error, the slice is filled in until the error was encountered. |
 | `Channel` | Serializes the chain into a `<-chan T`.  Returns a paired `<-chan error`.  If an error occurs, the value channel is closed, the error is sent on the error channel, then the error channel is closed. |
+| `Iterator` | Returns an `iter.Seq2[T, error]` so the chain can be consumed with `range`.  Yields `(value, nil)` for each value; if an upstream error occurs, yields `(zero, err)` once and stops. |
 | `ForEach` | Runs `forEachFunction` across every value.  Stops on the first error. |
 | `ForEachParallel` | Like `ForEach`, but invocations run concurrently.  Benchmark to confirm benefit. |
 | `Count` | Returns the number of values in the chain.  Counts accurately even when an error occurs partway. |

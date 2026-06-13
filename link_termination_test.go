@@ -72,6 +72,90 @@ func TestChannelHasError(t *testing.T) {
 	assert.Equal(expectedError, seenError)
 }
 
+func TestIterator(t *testing.T) {
+	assert := assert.New(t)
+
+	expectedSlice := []int{987, 8, 26}
+	generation := generator.FromSlice(expectedSlice)
+	link := newLink(generation)
+
+	var seenItems []int
+	var seenError error
+	for value, err := range link.Iterator() {
+		if err != nil {
+			seenError = err
+			continue
+		}
+		seenItems = append(seenItems, value)
+	}
+
+	assert.Equal(expectedSlice, seenItems)
+	assert.Nil(seenError)
+}
+
+func TestIteratorAfterChainMethods(t *testing.T) {
+	assert := assert.New(t)
+
+	inputSlice := []int{1, 2, 3, 4, 5}
+	link := FromSlice(inputSlice).
+		Filter(func(value int) (bool, error) {
+			return value%2 == 1, nil
+		}).
+		Map(func(value int) (int, error) {
+			return value * 10, nil
+		})
+
+	var seenItems []int
+	for value, err := range link.Iterator() {
+		assert.Nil(err)
+		seenItems = append(seenItems, value)
+	}
+
+	assert.Equal([]int{10, 30, 50}, seenItems)
+}
+
+func TestIteratorEarlyBreak(t *testing.T) {
+	assert := assert.New(t)
+
+	inputSlice := []int{987, 8, 26, 42, 100}
+	generation := generator.FromSlice(inputSlice)
+	link := newLink(generation)
+
+	var seenItems []int
+	for value, err := range link.Iterator() {
+		assert.Nil(err)
+		seenItems = append(seenItems, value)
+		if len(seenItems) == 2 {
+			break
+		}
+	}
+
+	assert.Equal([]int{987, 8}, seenItems)
+}
+
+func TestIteratorHasError(t *testing.T) {
+	assert := assert.New(t)
+
+	errorValue := 8
+	inputSlice := []int{987, errorValue, 26}
+	expectedError := errors.New("an example error yo")
+	generation := createGeneratorWithError(inputSlice, errorValue, expectedError)
+	link := newLink(generation)
+
+	var seenItems []int
+	var seenError error
+	for value, err := range link.Iterator() {
+		if err != nil {
+			seenError = err
+			continue
+		}
+		seenItems = append(seenItems, value)
+	}
+
+	assert.Equal([]int{987}, seenItems)
+	assert.Equal(expectedError, seenError)
+}
+
 func TestForEach(t *testing.T) {
 	assert := assert.New(t)
 
