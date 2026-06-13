@@ -3,6 +3,7 @@ package rangechain
 import (
 	"github.com/halprin/rangechain/keyvalue"
 	"github.com/stretchr/testify/assert"
+	"maps"
 	"slices"
 	"testing"
 )
@@ -46,6 +47,34 @@ func TestFromMap(t *testing.T) {
 		key3: value3,
 	}
 	chain := FromMap(input)
+
+	expectedOutput := []keyvalue.KeyValuer[string, int]{
+		&testKeyValue[string, int]{TheKey: key1, TheValue: value1},
+		&testKeyValue[string, int]{TheKey: key2, TheValue: value2},
+		&testKeyValue[string, int]{TheKey: key3, TheValue: value3},
+	}
+
+	slice, err := chain.Slice()
+	assertEqualsBasedOnKeyValuerInterface(t, expectedOutput, slice)
+	assert.Nil(err)
+}
+
+func TestFromSeq2(t *testing.T) {
+	assert := assert.New(t)
+
+	key1 := "DogCow"
+	value1 := 3
+	key2 := "goes"
+	value2 := 92
+	key3 := "Moof!"
+	value3 := 26
+
+	input := map[string]int{
+		key1: value1,
+		key2: value2,
+		key3: value3,
+	}
+	chain := FromSeq2(maps.All(input))
 
 	expectedOutput := []keyvalue.KeyValuer[string, int]{
 		&testKeyValue[string, int]{TheKey: key1, TheValue: value1},

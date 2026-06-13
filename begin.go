@@ -29,3 +29,9 @@ func FromMap[K comparable, V any](aMap map[K]V) *Link[keyvalue.KeyValuer[K, V]] 
 func FromIterator[T any](anIterator iter.Seq[T]) *Link[T] {
 	return newLink(generator.FromIterator(anIterator))
 }
+
+// FromSeq2 starts the chain with the supplied iter.Seq2 of key/value pairs.
+// Chaining and terminating methods can now be called on the result.  The singular value used to represent the key and value pairs is `keyvalue.KeyValuer` of `github.com/halprin/rangechain/keyvalue`.
+func FromSeq2[K, V any](seq iter.Seq2[K, V]) *Link[keyvalue.KeyValuer[K, V]] {
+	return newLink(generator.FromSeq2(seq))
+}

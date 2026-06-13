@@ -74,3 +74,21 @@ func FromIterator[T any](anIterator iter.Seq[T]) func() (T, error) {
 		return value, nil
 	}
 }
+
+// FromSeq2 creates a generator for an iter.Seq2 of key/value pairs.
+func FromSeq2[K, V any](seq iter.Seq2[K, V]) func() (keyvalue.KeyValuer[K, V], error) {
+	next, stop := iter.Pull2(seq)
+
+	return func() (keyvalue.KeyValuer[K, V], error) {
+		key, value, ok := next()
+		if !ok {
+			stop()
+			return nil, Exhausted
+		}
+
+		return &mapTuple[K, V]{
+			TheKey:   key,
+			TheValue: value,
+		}, nil
+	}
+}
