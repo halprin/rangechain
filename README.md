@@ -61,7 +61,7 @@ chain := rangechain.FromSlice(container)
 
 From there, you can call a plethora of additional methods to modify the container passed in originally. The methods fall into one of two categories: chaining or terminating.
 
-#### Value Types
+#### Types
 
 Thanks to Go 1.27 generic methods, the chain's element types flow through every step. No `value.(string)` type assertion needed; `value` is already a `string`.
 
