@@ -8,9 +8,7 @@ import (
 	"github.com/halprin/rangechain/internal/generator"
 )
 
-// Flatten will iterate over all the values in the chain, but any value encountered that is a range-able container itself will also have its values iterated over first before continuing with the remaining values in the chain.  Maps flatten to its `keyvalue.KeyValuer[any, any]` key and value pairs.
-//
-// The caller specifies the output element type `U`.  Each emitted inner value (or scalar) is type-asserted to `U`; on mismatch, an error is injected into the chain at that point and downstream terminations propagate it.
+// Flatten iterates each chain value; any value that is itself a slice, channel, iterator, or map is descended into (maps emit `keyvalue.KeyValuer[any, any]` entries). Each emitted inner value is type-asserted to `U`; a mismatch injects an error into the chain at that point.
 func (receiver *Link[T]) Flatten[U any]() *Link[U] {
 	var currentGenerator func() (any, error)
 
@@ -108,7 +106,7 @@ func channelAnyGenerator(channel any) func() (any, error) {
 	}
 }
 
-// mapAnyGenerator builds an any-typed generator over a map of unknown key/value types, using reflection.  Each emitted value is a `flattenMapTuple` that implements `keyvalue.KeyValuer[any, any]`.
+// mapAnyGenerator builds an any-typed generator over a map of unknown key/value types, using reflection. Each emitted value is a `flattenMapTuple` that implements `keyvalue.KeyValuer[any, any]`.
 func mapAnyGenerator(aMap any) func() (any, error) {
 	concreteValue := reflect.ValueOf(aMap)
 	mapIterator := concreteValue.MapRange()

@@ -7,7 +7,7 @@ import (
 	"github.com/halprin/rangechain/keyvalue"
 )
 
-// FromSlice starts the chain with the supplied slice.
+// FromSlice starts the chain with the supplied slice. Pass `arr[:]` for an array.
 // Chaining and terminating methods can now be called on the result.
 func FromSlice[T any](slice []T) *Link[T] {
 	return newLink(generator.FromSlice(slice))
@@ -19,8 +19,8 @@ func FromChannel[T any](channel <-chan T) *Link[T] {
 	return newLink(generator.FromChannel(channel))
 }
 
-// FromMap starts the chain with the supplied map.
-// Chaining and terminating methods can now be called on the result.  The singular value used to represent the key and value pairs is `keyvalue.KeyValuer` of `github.com/halprin/rangechain/keyvalue`.
+// FromMap starts the chain with the supplied map. Each chain element is a `keyvalue.KeyValuer[K, V]` from `github.com/halprin/rangechain/keyvalue`.
+// Chaining and terminating methods can now be called on the result.
 func FromMap[K comparable, V any](aMap map[K]V) *Link[keyvalue.KeyValuer[K, V]] {
 	return newLink(generator.FromMap(aMap))
 }
@@ -32,7 +32,7 @@ func FromIterator[T any](anIterator iter.Seq[T]) *Link[T] {
 }
 
 // FromSeq2 starts the chain with the supplied iter.Seq2 of key/value pairs.
-// Chaining and terminating methods can now be called on the result.  The singular value used to represent the key and value pairs is `keyvalue.KeyValuer` of `github.com/halprin/rangechain/keyvalue`.
+// Chaining and terminating methods can now be called on the result. The singular value used to represent the key and value pairs is `keyvalue.KeyValuer` of `github.com/halprin/rangechain/keyvalue`.
 func FromSeq2[K, V any](seq iter.Seq2[K, V]) *Link[keyvalue.KeyValuer[K, V]] {
 	return newLink(generator.FromSeq2(seq))
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/halprin/rangechain/internal/generator"
 )
 
-// Slice serializes the chain into a slice and returns it.  Also returns an error if any previous chain method generated an error.  If an error is returned, the slice is filled in until the error was encountered.
+// Slice serializes the chain into a slice and returns it. Also returns an error if any previous chain method generated one. On error, the slice is filled in until the error was encountered.
 func (receiver *Link[T]) Slice() ([]T, error) {
 	endSlice := []T{}
 
@@ -25,7 +25,7 @@ func (receiver *Link[T]) Slice() ([]T, error) {
 	}
 }
 
-// Channel serializes the chain into a channel.  Also returns any errors in a channel if any previous chain method generated an error.  If an error is returned, the value channel is closed, the error is sent on the error channel, and the error channel is closed.
+// Channel serializes the chain into a channel. Returns a paired error channel. If an error occurs, the value channel is closed, the error is sent on the error channel, then the error channel is closed.
 func (receiver *Link[T]) Channel() (<-chan T, <-chan error) {
 	endChannel := make(chan T)
 	errorChannel := make(chan error)
@@ -51,7 +51,7 @@ func (receiver *Link[T]) Channel() (<-chan T, <-chan error) {
 	return endChannel, errorChannel
 }
 
-// Iterator serializes the chain into an `iter.Seq2[T, error]` so it can be consumed with `range`.  Each value is yielded as `(value, nil)`.  If any previous chain method generated an error, the iterator yields `(zero, err)` once and then stops.
+// Iterator returns an `iter.Seq2[T, error]` so the chain can be consumed with `range`. Yields `(value, nil)` for each value; if an upstream error occurs, yields `(zero, err)` once and stops.
 func (receiver *Link[T]) Iterator() iter.Seq2[T, error] {
 	return func(yield func(T, error) bool) {
 		for {
@@ -72,7 +72,7 @@ func (receiver *Link[T]) Iterator() iter.Seq2[T, error] {
 	}
 }
 
-// ForEach will run the `forEachFunction` parameter function across all the values in the chain.  Also returns an error if any previous chain method generated an error.  If an error is encountered, the function stops executing against the remaining chain.
+// ForEach runs `forEachFunction` parameter across every value in the chain. Stops on the first error and returns it.
 func (receiver *Link[T]) ForEach(forEachFunction func(T)) error {
 	for {
 		currentValue, err := receiver.generator()
@@ -88,7 +88,7 @@ func (receiver *Link[T]) ForEach(forEachFunction func(T)) error {
 	}
 }
 
-// ForEachParallel will run the `forEachFunction` parameter function across all the values in the chain in parallel.  Also returns an error if any previous chain method generated an error.  If an error is encountered, the function stops executing against the remaining chain.  There is overhead to running in parallel so benchmark to ensure you benefit from this version.
+// ForEachParallel is like ForEach, but invocations run concurrently. There is overhead to running in parallel so benchmark to ensure you benefit from this version.
 func (receiver *Link[T]) ForEachParallel(forEachFunction func(T)) error {
 	for {
 		currentValue, err := receiver.generator()
@@ -104,7 +104,7 @@ func (receiver *Link[T]) ForEachParallel(forEachFunction func(T)) error {
 	}
 }
 
-// Count returns the number of values in the chain.  Also returns an error if any previous chain method generated an error.  Count returns an accurate number even if an error is encountered.
+// Count returns the number of values in the chain. Counts accurately even when an error occurs partway, and returns that error.
 func (receiver *Link[T]) Count() (int, error) {
 	count := 0
 	var firstError error
@@ -124,7 +124,7 @@ func (receiver *Link[T]) Count() (int, error) {
 	}
 }
 
-// First returns just a pointer to the first value in the chain.  If the chain is empty, returns `nil`.  Also returns an error if any previous chain method generated an error that affects the first value.
+// First returns a pointer to the first value. `nil` if the chain is empty. Also returns an error if encountered.
 func (receiver *Link[T]) First() (*T, error) {
 	value, err := receiver.generator()
 	if err != nil {
@@ -138,7 +138,7 @@ func (receiver *Link[T]) First() (*T, error) {
 	return &value, nil
 }
 
-// Last returns just a pointer to the last value in the chain.  If the chain is empty, returns `nil`.  Also returns an error if any previous chain method generated an error that affects the last value.
+// Last returns a pointer to the last value. `nil` if the chain is empty. Also returns an error if encountered.
 func (receiver *Link[T]) Last() (*T, error) {
 	var lastValue *T
 	var lastError error
@@ -154,7 +154,7 @@ func (receiver *Link[T]) Last() (*T, error) {
 	}
 }
 
-// AllMatch will run the `allMatchFunction` parameter function across all the values in the chain.  If every `allMatchFunction` function invocation returns true, this method returns true.  If a single `allMatchFunction` function invocation returns false, this method returns false.  Also returns false and an error if any previous chain method generated an error or if an error is returned from the `allMatchFunction` function.
+// AllMatch returns true when the `allMatchFunction` parameter returns true for every value, false otherwise. False (with the error) when an error is encountered or if `allMatchFunction` errors itself.
 func (receiver *Link[T]) AllMatch(allMatchFunction func(T) (bool, error)) (bool, error) {
 	for {
 		currentValue, err := receiver.generator()
@@ -175,7 +175,7 @@ func (receiver *Link[T]) AllMatch(allMatchFunction func(T) (bool, error)) (bool,
 	}
 }
 
-// AnyMatch will run the `anyMatchFunction` parameter function across all the values in the chain.  If any `anyMatchFunction` function invocation returns true, this method returns true.  If every invocation `anyMatchFunction` invocation returns false, this method returns false.   Also returns false and an error if any previous chain method generated an error or if an error is returned from the `anyMatchFunction` function.
+// AnyMatch returns true when the `anyMatchFunction` parameter returns true for any value, false otherwise. False (with the error) when an error is encountered or if `anyMatchFunction` errors itself.
 func (receiver *Link[T]) AnyMatch(anyMatchFunction func(T) (bool, error)) (bool, error) {
 	for {
 		currentValue, err := receiver.generator()
@@ -196,13 +196,13 @@ func (receiver *Link[T]) AnyMatch(anyMatchFunction func(T) (bool, error)) (bool,
 	}
 }
 
-// NoneMatch will do the exact opposite of `AnyMatch` when it comes to the boolean return value.  Returns an error for the same reasons as `AnyMatch`.
+// NoneMatch is the boolean opposite of `AnyMatch`. Returns an error for the same reasons as `AnyMatch`.
 func (receiver *Link[T]) NoneMatch(noneMatchFunction func(T) (bool, error)) (bool, error) {
 	match, err := receiver.AnyMatch(noneMatchFunction)
 	return !match, err
 }
 
-// Reduce applies the `reduceFunction` parameter function to two values in the chain cumulatively.  Subsequent calls to `reduceFunction` uses the previous return value from `reduceFunction` as the first argument and the next value in the chain as the second argument.  A pointer to the final value is returned.  If the chain is empty, `nil` is returned.  Also returns an error if any previous chain method generated an error or if an error is returned from the `reduceFunction` function.
+// Reduce runs the `reduceFunction` parameter to two values in the chain cumulatively. Subsequent calls to `reduceFunction` uses the previous return value from `reduceFunction` as the first argument and the next value in the chain as the second argument. A pointer to the final value is returned. If the chain is empty, `nil` is returned. Also returns an error if any previous chain method generated an error or if an error is returned from the `reduceFunction` function.
 func (receiver *Link[T]) Reduce(reduceFunction func(T, T) (T, error)) (*T, error) {
 	nextItem, err := receiver.generator()
 	if err != nil {
@@ -238,7 +238,7 @@ func (receiver *Link[T]) Reduce(reduceFunction func(T, T) (T, error)) (*T, error
 	return &intermediateItem, err
 }
 
-// ReduceWithInitialValue applies the `reduceFunction` parameter function to two values in the chain cumulatively.  Subsequent calls to `reduceFunction` uses the previous return value from `reduceFunction` as the first argument and the next value in the chain as the second argument.  The parameter `initialValue` is placed before the entire chain and therefore is the first argument on the first invocation of `initialValue`.  The final value is returned.  If the chain is empty, `initialValue` is returned.  Also returns an error if any previous chain method generated an error or if an error is returned from the `reduceFunction` function.
+// ReduceWithInitialValue is similar to Reduce, but starts with `initialValue` in the chain.
 func (receiver *Link[T]) ReduceWithInitialValue[A any](reduceFunction func(A, T) (A, error), initialValue A) (A, error) {
 	nextItem, err := receiver.generator()
 	if err != nil {

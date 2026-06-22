@@ -1,6 +1,6 @@
 package rangechain
 
-// Link is not meant to be initialized directly by external users.  Use the `From*` functions.
+// Link is not meant to be initialized directly by external users. Use the `From*` functions.
 type Link[T any] struct {
 	generator func() (T, error)
 }

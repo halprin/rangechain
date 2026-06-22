@@ -2,7 +2,7 @@ package rangechain
 
 import "github.com/halprin/rangechain/internal/generator"
 
-// MapParallel will run the `mapFunction` parameter function against all the values in the chain in parallel.  In that function, return what you want to change the value into or an optional error if an error is encountered.  There is overhead to running in parallel so benchmark to ensure you benefit from this version.
+// MapParallel is like Map, but invocations run concurrently. There is overhead to running in parallel so benchmark to ensure you benefit from this version.
 func (receiver *Link[T]) MapParallel[U any](mapFunction func(T) (U, error)) *Link[U] {
 	computedValues := false
 	var mappedReturnValues []chan U
@@ -64,7 +64,7 @@ type filterResult[T any] struct {
 	keep  bool
 }
 
-// FilterParallel will run the `filterFunction` parameter function against all the values in the chain in parallel.  In that function, on return of true, the value will stay in the chain, or on false, the value will be removed from the chain.  There is overhead to running in parallel so benchmark to ensure you benefit from this version.
+// FilterParallel is like Filter, but invocations run concurrently. There is overhead to running in parallel so benchmark to ensure you benefit from this version.
 func (receiver *Link[T]) FilterParallel(filterFunction func(T) (bool, error)) *Link[T] {
 	computedValues := false
 	var resultChannels []chan filterResult[T]

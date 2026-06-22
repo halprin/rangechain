@@ -7,7 +7,7 @@ import (
 	"github.com/halprin/rangechain/internal/helper"
 )
 
-// Map will run the `mapFunction` parameter function against all the values in the chain.  In that function, return what you want to change the value into or an optional error if an error is encountered.
+// Map runs the `mapFunction` parameter against all the values in the chain. In that function, return what you want to change the value into or an optional error.
 func (receiver *Link[T]) Map[U any](mapFunction func(T) (U, error)) *Link[U] {
 	mapGenerator := func() (U, error) {
 		valueToMap, err := receiver.generator()
@@ -22,7 +22,7 @@ func (receiver *Link[T]) Map[U any](mapFunction func(T) (U, error)) *Link[U] {
 	return newLink(mapGenerator)
 }
 
-// Filter will run the `filterFunction` parameter function against all the values in the chain.  In that function, on return of true, the value will stay, or on false, the value will be removed.
+// Filter runs the `filterFunction` parameter against all the values in the chain. Returning true keeps the value; returning false drops it.
 func (receiver *Link[T]) Filter(filterFunction func(T) (bool, error)) *Link[T] {
 	filterGenerator := func() (T, error) {
 		for {
@@ -45,7 +45,7 @@ func (receiver *Link[T]) Filter(filterFunction func(T) (bool, error)) *Link[T] {
 	return newLink(filterGenerator)
 }
 
-// Skip skips over the parameter `skipNumber` number of values and effectively removes them from the chain.  Also skips over any errors previously generated.
+// Skip skips the next `skipNumber` values in the chain (including any errors already in flight).
 func (receiver *Link[T]) Skip(skipNumber int) *Link[T] {
 	for count := 0; count < skipNumber; count++ {
 		_, _ = receiver.generator()
@@ -54,7 +54,7 @@ func (receiver *Link[T]) Skip(skipNumber int) *Link[T] {
 	return newLink(receiver.generator)
 }
 
-// Limit stops the chain after the parameter `keepSize` number of values.  Any elements afterward are effectively removed.
+// Limit stops the chain after `keepSize` values have been emitted.
 func (receiver *Link[T]) Limit(keepSize int) *Link[T] {
 	itemsSeen := 0
 
@@ -78,7 +78,7 @@ func (receiver *Link[T]) Limit(keepSize int) *Link[T] {
 	return newLink(limitGenerator)
 }
 
-// DistinctFunc removes any duplicates as identified by the parameter `keyFunction`.  Two values whose `keyFunction` returns the same `K` are considered equal.
+// DistinctFunc removes duplicates. Two values whose `keyFunction` returns the same value are considered equal. Use `func(v T) T { return v }` when the values are already comparable.
 func (receiver *Link[T]) DistinctFunc[K comparable](keyFunction func(T) K) *Link[T] {
 	seenTracker := helper.NewSet[K]()
 
@@ -101,7 +101,7 @@ func (receiver *Link[T]) DistinctFunc[K comparable](keyFunction func(T) K) *Link
 	return newLink(distinctGenerator)
 }
 
-// Sort sorts the chain given the `Less` function returned from the `returnLessFunction` function parameter.  The `returnLessFunction` function is called with the entire serialized chain as a slice and _returns_ a function that satisfies the same requirements as the Interface type's `Less` function (https://pkg.go.dev/sort#Interface).  This method is expensive because it must serialize all the values into a slice first.
+// Sort sorts the chain using a `Less` function returned by the `returnLessFunction` parameter. The returned function must satisfy the same requirements as the Interface type's `Less` function (https://pkg.go.dev/sort#Interface). See the TestSortingMaps example in example_test.go. Expensive because it serializes the chain first.
 func (receiver *Link[T]) Sort(returnLessFunction func([]T) func(int, int) bool) *Link[T] {
 	serializedSlice, err := receiver.Slice()
 	if err != nil {
@@ -120,7 +120,7 @@ func (receiver *Link[T]) Sort(returnLessFunction func([]T) func(int, int) bool) 
 	return newLink(generation)
 }
 
-// Reverse reverses the order of the chain.  The last item will be first, and the first item will be last.  This method is expensive because it must serialize all the values into a slice first.
+// Reverse reverses the order of the chain. Expensive because it serializes the chain first.
 func (receiver *Link[T]) Reverse() *Link[T] {
 	serializedSlice, err := receiver.Slice()
 	if err != nil {
