@@ -3,9 +3,10 @@ package generator
 
 import (
 	"errors"
-	"github.com/halprin/rangechain/keyvalue"
 	"iter"
 	"maps"
+
+	"github.com/halprin/rangechain/keyvalue"
 )
 
 // Exhausted is returned as an expected error from the generators to designate an end of the generator.

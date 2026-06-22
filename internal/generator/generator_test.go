@@ -1,9 +1,10 @@
 package generator
 
 import (
-	"github.com/stretchr/testify/assert"
 	"slices"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFromSliceWithLastTimeError(t *testing.T) {
