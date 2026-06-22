@@ -40,7 +40,7 @@ result, _ := rangechain.FromSlice([]any{
 // result == []any{1, 2, 3, 4, 5, 6}
 ```
 
-See [`example_test.go` file](./example_test.go) for some examples.
+See [`example_test.go` file](./example_test.go) for more examples.
 
 ### Start the Chain
 
