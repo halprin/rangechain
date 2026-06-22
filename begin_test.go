@@ -1,11 +1,12 @@
 package rangechain
 
 import (
-	"github.com/halprin/rangechain/keyvalue"
-	"github.com/stretchr/testify/assert"
 	"maps"
 	"slices"
 	"testing"
+
+	"github.com/halprin/rangechain/keyvalue"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFromSlice(t *testing.T) {

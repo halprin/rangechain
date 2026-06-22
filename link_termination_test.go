@@ -2,10 +2,11 @@ package rangechain
 
 import (
 	"errors"
-	"github.com/halprin/rangechain/internal/generator"
-	"github.com/stretchr/testify/assert"
 	"sync"
 	"testing"
+
+	"github.com/halprin/rangechain/internal/generator"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSlice(t *testing.T) {

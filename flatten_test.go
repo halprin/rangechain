@@ -1,8 +1,9 @@
 package rangechain
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var isCheckSlice = []int{1, 2, 3}

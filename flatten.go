@@ -3,8 +3,9 @@ package rangechain
 import (
 	"errors"
 	"fmt"
-	"github.com/halprin/rangechain/internal/generator"
 	"reflect"
+
+	"github.com/halprin/rangechain/internal/generator"
 )
 
 // Flatten will iterate over all the values in the chain, but any value encountered that is a range-able container itself will also have its values iterated over first before continuing with the remaining values in the chain.  Maps flatten to its `keyvalue.KeyValuer[any, any]` key and value pairs.

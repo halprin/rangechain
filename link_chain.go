@@ -1,9 +1,10 @@
 package rangechain
 
 import (
+	"sort"
+
 	"github.com/halprin/rangechain/internal/generator"
 	"github.com/halprin/rangechain/internal/helper"
-	"sort"
 )
 
 // Map will run the `mapFunction` parameter function against all the values in the chain.  In that function, return what you want to change the value into or an optional error if an error is encountered.

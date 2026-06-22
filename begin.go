@@ -1,9 +1,10 @@
 package rangechain
 
 import (
+	"iter"
+
 	"github.com/halprin/rangechain/internal/generator"
 	"github.com/halprin/rangechain/keyvalue"
-	"iter"
 )
 
 // FromSlice starts the chain with the supplied slice.

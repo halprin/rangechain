@@ -2,9 +2,10 @@ package rangechain
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/halprin/rangechain/internal/generator"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestMapParallel(t *testing.T) {

@@ -2,10 +2,11 @@ package rangechain
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/halprin/rangechain/internal/generator"
 	"github.com/halprin/rangechain/keyvalue"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestMap(t *testing.T) {

@@ -23,6 +23,73 @@ import "github.com/halprin/rangechain"
 
 ### Examples
 
+Filter then map:
+
+```go
+words := []string{"DogCow", "Moof", "Clarus", "the", "DogCow"}
+
+result, _ := rangechain.FromSlice(words).
+    Filter(func(w string) (bool, error) { return len(w) > 3, nil }).
+    Map(func(w string) (string, error) { return strings.ToUpper(w), nil }).
+    Slice()
+// result == []string{"DOGCOW", "MOOF", "CLARUS", "DOGCOW"}
+```
+
+`Map` can change the element type:
+
+```go
+lengths, _ := rangechain.FromSlice([]string{"a", "bb", "ccc"}).
+    Map(func(w string) (int, error) { return len(w), nil }).
+    Slice()
+// lengths == []int{1, 2, 3}
+```
+
+Sort a map by value, then take the top N keys:
+
+```go
+scores := map[string]int{"Mac OS 9": 9, "Mac OS X": 10, "System 7": 7}
+
+top, _ := rangechain.FromMap(scores).
+    Sort(func(kvs []keyvalue.KeyValuer[string, int]) func(int, int) bool {
+        return func(i, j int) bool { return kvs[i].Value() > kvs[j].Value() }
+    }).
+    Map(func(kv keyvalue.KeyValuer[string, int]) (string, error) {
+        return kv.Key(), nil
+    }).
+    Limit(2).
+    Slice()
+// top == []string{"Mac OS X", "Mac OS 9"}
+```
+
+Consume the chain lazily with `Iterator` and `range`:
+
+```go
+chain := rangechain.FromSlice([]int{1, 2, 3, 4, 5}).
+    Filter(func(v int) (bool, error) { return v%2 == 1, nil }).
+    Map(func(v int) (int, error) { return v * 10, nil })
+
+for value, err := range chain.Iterator() {
+    if err != nil {
+        // handle the upstream error and stop
+        break
+    }
+    fmt.Println(value) // 10, 30, 50
+}
+```
+
+Reduce into a different type to build a frequency map:
+
+```go
+words := []string{"go", "rust", "go", "c"}
+
+counts, _ := rangechain.FromSlice(words).
+    ReduceWithInitialValue(func(acc map[string]int, w string) (map[string]int, error) {
+        acc[w]++
+        return acc, nil
+    }, map[string]int{})
+// counts == map[string]int{"go": 2, "rust": 1, "c": 1}
+```
+
 Homogeneous case — caller knows the inner element type:
 
 ```go
