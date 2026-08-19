@@ -3,103 +3,93 @@ package generator
 
 import (
 	"errors"
-	"github.com/halprin/rangechain/internal/helper"
 	"iter"
-	"reflect"
+	"maps"
+
+	"github.com/halprin/rangechain/keyvalue"
 )
 
 // Exhausted is returned as an expected error from the generators to designate an end of the generator.
 var Exhausted = errors.New("generator exhausted")
 
 // FromSlice creates a generator for a slice.
-func FromSlice(slice interface{}) func() (interface{}, error) {
-	if !helper.IsSlice(slice) {
-		panic("non-slice type provided")
+func FromSlice[T any](slice []T) func() (T, error) {
+	currentIndex := 0
+
+	return func() (T, error) {
+		if currentIndex >= len(slice) {
+			var zero T
+			return zero, Exhausted
+		}
+
+		value := slice[currentIndex]
+		currentIndex++
+
+		return value, nil
 	}
-
-	return generatorFromSliceOrArray(slice)
-}
-
-// FromArray creates a generator for an array.
-func FromArray(array interface{}) func() (interface{}, error) {
-	if !helper.IsArray(array) {
-		panic("non-array type provided")
-	}
-
-	return generatorFromSliceOrArray(array)
 }
 
 // FromChannel creates a generator for a channel.
-func FromChannel(channel interface{}) func() (interface{}, error) {
-	if !helper.IsChannel(channel) {
-		panic("non-channel type provided")
-	}
-
-	concreteValue := reflect.ValueOf(channel)
-
-	return func() (interface{}, error) {
-		for {
-			value, ok := concreteValue.Recv()
-			if !ok {
-				return 0, Exhausted
-			}
-
-			return value.Interface(), nil
+func FromChannel[T any](channel <-chan T) func() (T, error) {
+	return func() (T, error) {
+		value, ok := <-channel
+		if !ok {
+			var zero T
+			return zero, Exhausted
 		}
+
+		return value, nil
 	}
 }
 
 // FromMap creates a generator for a map.
-func FromMap(aMap interface{}) func() (interface{}, error) {
-	if !helper.IsMap(aMap) {
-		panic("non-map type provided")
-	}
+func FromMap[K comparable, V any](aMap map[K]V) func() (keyvalue.KeyValuer[K, V], error) {
+	next, stop := iter.Pull2(maps.All(aMap))
 
-	concreteValue := reflect.ValueOf(aMap)
-	mapIterator := concreteValue.MapRange()
-
-	return func() (interface{}, error) {
-		hasNext := mapIterator.Next()
-		if !hasNext {
-			return 0, Exhausted
+	return func() (keyvalue.KeyValuer[K, V], error) {
+		key, value, ok := next()
+		if !ok {
+			stop()
+			return nil, Exhausted
 		}
 
-		tuple := &mapTuple{
-			TheKey:   mapIterator.Key().Interface(),
-			TheValue: mapIterator.Value().Interface(),
-		}
-
-		return tuple, nil
+		return &mapTuple[K, V]{
+			TheKey:   key,
+			TheValue: value,
+		}, nil
 	}
 }
 
-func FromIterator[T any](anIterator iter.Seq[T]) func() (interface{}, error) {
+// FromIterator creates a generator for an iter.Seq.
+func FromIterator[T any](anIterator iter.Seq[T]) func() (T, error) {
 	next, stop := iter.Pull(anIterator)
 
-	return func() (interface{}, error) {
+	return func() (T, error) {
 		value, ok := next()
 		if !ok {
 			stop()
-			return 0, Exhausted
+			var zero T
+			return zero, Exhausted
 		}
 
 		return value, nil
 	}
 }
 
-func generatorFromSliceOrArray(sliceOrArray interface{}) func() (interface{}, error) {
-	concreteValue := reflect.ValueOf(sliceOrArray)
+// FromSeq2 creates a generator for an iter.Seq2 of key/value pairs.
+func FromSeq2[K, V any](seq iter.Seq2[K, V]) func() (keyvalue.KeyValuer[K, V], error) {
+	next, stop := iter.Pull2(seq)
 
-	currentIndex := 0
-
-	return func() (interface{}, error) {
-		if currentIndex >= concreteValue.Len() {
-			return 0, Exhausted
+	return func() (keyvalue.KeyValuer[K, V], error) {
+		key, value, ok := next()
+		if !ok {
+			stop()
+			return nil, Exhausted
 		}
 
-		value := concreteValue.Index(currentIndex).Interface()
-		currentIndex++
-
-		return value, nil
+		return &mapTuple[K, V]{
+			TheKey:   key,
+			TheValue: value,
+		}, nil
 	}
 }

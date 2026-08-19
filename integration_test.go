@@ -2,8 +2,9 @@ package rangechain
 
 import (
 	"errors"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSkipSkipsErrors(t *testing.T) {
@@ -12,15 +13,14 @@ func TestSkipSkipsErrors(t *testing.T) {
 	errorValue := 987
 	inputSlice := []int{errorValue, errorValue, 8, 26}
 	chain := FromSlice(inputSlice)
-	slice, err := chain.Map(func(value interface{}) (interface{}, error) {
-		intValue := value.(int)
-		if intValue == errorValue {
-			return intValue, errors.New("an example error yo")
+	slice, err := chain.Map(func(value int) (int, error) {
+		if value == errorValue {
+			return value, errors.New("an example error yo")
 		}
 
-		return intValue, nil
+		return value, nil
 	}).Skip(2).Slice()
 
-	assert.Equal([]interface{}{8, 26}, slice)
+	assert.Equal([]int{8, 26}, slice)
 	assert.Nil(err)
 }

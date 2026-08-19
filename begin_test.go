@@ -1,33 +1,22 @@
 package rangechain
 
 import (
-	"github.com/halprin/rangechain/keyvalue"
-	"github.com/stretchr/testify/assert"
+	"maps"
 	"slices"
 	"testing"
+
+	"github.com/halprin/rangechain/keyvalue"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFromSlice(t *testing.T) {
 	assert := assert.New(t)
 
 	inputSlice := []string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
-	expectedOutput := []interface{}{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
 	chain := FromSlice(inputSlice)
 
 	slice, err := chain.Slice()
-	assert.Equal(expectedOutput, slice)
-	assert.Nil(err)
-}
-
-func TestFromArray(t *testing.T) {
-	assert := assert.New(t)
-
-	input := [...]string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
-	expectedOutput := []interface{}{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
-	chain := FromArray(input)
-
-	slice, err := chain.Slice()
-	assert.Equal(expectedOutput, slice)
+	assert.Equal(inputSlice, slice)
 	assert.Nil(err)
 }
 
@@ -35,12 +24,11 @@ func TestFromChannel(t *testing.T) {
 	assert := assert.New(t)
 
 	innerInput := []string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
-	expectedOutput := []interface{}{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
 	input := createTestStringChannel(innerInput)
-	chain := FromChannel(input)
+	chain := FromChannel((<-chan string)(input))
 
 	slice, err := chain.Slice()
-	assert.Equal(expectedOutput, slice)
+	assert.Equal(innerInput, slice)
 	assert.Nil(err)
 }
 
@@ -61,23 +49,41 @@ func TestFromMap(t *testing.T) {
 	}
 	chain := FromMap(input)
 
-	expectedOutput := []interface{}{
-		&testKeyValue{
-			TheKey:   key1,
-			TheValue: value1,
-		},
-		&testKeyValue{
-			TheKey:   key2,
-			TheValue: value2,
-		},
-		&testKeyValue{
-			TheKey:   key3,
-			TheValue: value3,
-		},
+	expectedOutput := []keyvalue.KeyValuer[string, int]{
+		&testKeyValue[string, int]{TheKey: key1, TheValue: value1},
+		&testKeyValue[string, int]{TheKey: key2, TheValue: value2},
+		&testKeyValue[string, int]{TheKey: key3, TheValue: value3},
 	}
 
 	slice, err := chain.Slice()
-	//not testing the order because we are not guaranteed the order in which a map is iterated over
+	assertEqualsBasedOnKeyValuerInterface(t, expectedOutput, slice)
+	assert.Nil(err)
+}
+
+func TestFromSeq2(t *testing.T) {
+	assert := assert.New(t)
+
+	key1 := "DogCow"
+	value1 := 3
+	key2 := "goes"
+	value2 := 92
+	key3 := "Moof!"
+	value3 := 26
+
+	input := map[string]int{
+		key1: value1,
+		key2: value2,
+		key3: value3,
+	}
+	chain := FromSeq2(maps.All(input))
+
+	expectedOutput := []keyvalue.KeyValuer[string, int]{
+		&testKeyValue[string, int]{TheKey: key1, TheValue: value1},
+		&testKeyValue[string, int]{TheKey: key2, TheValue: value2},
+		&testKeyValue[string, int]{TheKey: key3, TheValue: value3},
+	}
+
+	slice, err := chain.Slice()
 	assertEqualsBasedOnKeyValuerInterface(t, expectedOutput, slice)
 	assert.Nil(err)
 }
@@ -87,24 +93,23 @@ func TestFromIterator(t *testing.T) {
 
 	inputSlice := []string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
 	inputIterator := slices.Values(inputSlice)
-	expectedOutput := []interface{}{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
 	chain := FromIterator(inputIterator)
 
 	slice, err := chain.Slice()
-	assert.Equal(expectedOutput, slice)
+	assert.Equal(inputSlice, slice)
 	assert.Nil(err)
 }
 
-type testKeyValue struct {
-	TheKey   interface{}
-	TheValue interface{}
+type testKeyValue[K, V any] struct {
+	TheKey   K
+	TheValue V
 }
 
-func (t *testKeyValue) Key() interface{} {
+func (t *testKeyValue[K, V]) Key() K {
 	return t.TheKey
 }
 
-func (t *testKeyValue) Value() interface{} {
+func (t *testKeyValue[K, V]) Value() V {
 	return t.TheValue
 }
 
@@ -121,31 +126,23 @@ func createTestStringChannel(stringSlice []string) chan string {
 	return stringChannel
 }
 
-func assertEqualsBasedOnKeyValuerInterface(t *testing.T, expected []interface{}, actual []interface{}) {
+func assertEqualsBasedOnKeyValuerInterface[K comparable, V comparable](t *testing.T, expected []keyvalue.KeyValuer[K, V], actual []keyvalue.KeyValuer[K, V]) {
 	assert := assert.New(t)
 
 	assert.Len(actual, len(expected))
 
 	for _, expectedValue := range expected {
-		expectedKeyValuer, isType := expectedValue.(keyvalue.KeyValuer)
-		if !isType {
-			continue
-		}
-		keyToFind := expectedKeyValuer.Key()
+		keyToFind := expectedValue.Key()
 		foundMatch := false
 
 		for _, actualValue := range actual {
-			actualKeyValuer, isType := actualValue.(keyvalue.KeyValuer)
-			if !isType {
-				continue
-			}
-			actualKey := actualKeyValuer.Key()
+			actualKey := actualValue.Key()
 
 			if actualKey != keyToFind {
 				continue
 			}
 
-			if expectedKeyValuer.Value() != actualKeyValuer.Value() {
+			if expectedValue.Value() != actualValue.Value() {
 				continue
 			}
 

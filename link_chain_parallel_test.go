@@ -2,17 +2,17 @@ package rangechain
 
 import (
 	"errors"
-	"github.com/halprin/rangechain/internal/generator"
-	"github.com/halprin/rangechain/internal/helper"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/halprin/rangechain/internal/generator"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMapParallel(t *testing.T) {
 	assert := assert.New(t)
 
 	inputSlice := []string{"DogCows", "goes", "Moof!", "Do", "you", "like", "Clarus", "the", "DogCow?"}
-	var expectedOutput []interface{}
+	var expectedOutput []int
 	for _, stringValue := range inputSlice {
 		expectedOutput = append(expectedOutput, len(stringValue))
 	}
@@ -20,9 +20,8 @@ func TestMapParallel(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := newLink(generation)
 
-	mapFunction := func(value interface{}) (interface{}, error) {
-		stringValue := value.(string)
-		return len(stringValue), nil
+	mapFunction := func(value string) (int, error) {
+		return len(value), nil
 	}
 
 	actualSlice, err := link.MapParallel(mapFunction).Slice()
@@ -41,12 +40,11 @@ func TestMapParallelHasError(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := newLink(generation)
 
-	mapFunction := func(value interface{}) (interface{}, error) {
-		stringValue := value.(string)
-		if stringValue == errorValue {
+	mapFunction := func(value string) (int, error) {
+		if value == errorValue {
 			return 0, expectedError
 		}
-		return len(stringValue), nil
+		return len(value), nil
 	}
 
 	_, err := link.MapParallel(mapFunction).Slice()
@@ -58,13 +56,12 @@ func TestFilterParallel(t *testing.T) {
 	assert := assert.New(t)
 
 	inputSlice := []int{7, 4, 2, 3, 9, 5, 6, 0, 8, 1}
-	expectedSlice := helper.InterfaceSlice([]int{7, 9, 6, 8})
+	expectedSlice := []int{7, 9, 6, 8}
 	generation := generator.FromSlice(inputSlice)
 	link := newLink(generation)
 
-	filterFunction := func(value interface{}) (bool, error) {
-		intValue := value.(int)
-		return intValue > 5, nil
+	filterFunction := func(value int) (bool, error) {
+		return value > 5, nil
 	}
 
 	actualSlice, err := link.FilterParallel(filterFunction).Slice()
@@ -82,12 +79,11 @@ func TestFilterParallelHasError(t *testing.T) {
 	generation := generator.FromSlice(inputSlice)
 	link := newLink(generation)
 
-	filterFunction := func(value interface{}) (bool, error) {
-		intValue := value.(int)
-		if intValue == errorValue {
+	filterFunction := func(value int) (bool, error) {
+		if value == errorValue {
 			return false, expectedError
 		}
-		return intValue > 5, nil
+		return value > 5, nil
 	}
 
 	_, err := link.FilterParallel(filterFunction).Slice()

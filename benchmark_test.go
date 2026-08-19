@@ -8,7 +8,7 @@ import (
 var size10Slice = makeIntSliceOfSize(10)
 var size100Slice = makeIntSliceOfSize(100)
 var size1000Slice = makeIntSliceOfSize(1000)
-var sliceOfSlice = [][]int{size1000Slice, size1000Slice, size1000Slice}
+var sliceOfSlice = []any{size1000Slice, size1000Slice, size1000Slice}
 
 func BenchmarkIntermediate10(b *testing.B) {
 	benchmarkIntermediate(b, size10Slice)
@@ -39,19 +39,17 @@ func BenchmarkForLoop1000(b *testing.B) {
 
 func BenchmarkFlatten1000(b *testing.B) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSlice(sliceOfSlice).Flatten().Filter(func(value interface{}) (bool, error) {
-			intValue := value.(int)
-			return intValue%2 == 0, nil
-		}).Map(func(value interface{}) (interface{}, error) {
-			intValue := value.(int)
-			return intValue*2 + 2, nil
+		FromSlice(sliceOfSlice).Flatten[int]().Filter(func(value int) (bool, error) {
+			return value%2 == 0, nil
+		}).Map(func(value int) (int, error) {
+			return value*2 + 2, nil
 		}).Slice()
 	}
 }
 
 func BenchmarkSleepWithSerialMap(b *testing.B) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSlice(size10Slice).Map(func(value interface{}) (interface{}, error) {
+		FromSlice(size10Slice).Map(func(value int) (int, error) {
 			time.Sleep(100 * time.Millisecond)
 			return value, nil
 		}).Slice()
@@ -60,7 +58,7 @@ func BenchmarkSleepWithSerialMap(b *testing.B) {
 
 func BenchmarkSleepWithParallelMap(b *testing.B) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSlice(size10Slice).MapParallel(func(value interface{}) (interface{}, error) {
+		FromSlice(size10Slice).MapParallel(func(value int) (int, error) {
 			time.Sleep(100 * time.Millisecond)
 			return value, nil
 		}).Slice()
@@ -79,12 +77,10 @@ func makeIntSliceOfSize(size int) []int {
 
 func benchmarkIntermediate(b *testing.B, inputSlice []int) {
 	for runIndex := 0; runIndex < b.N; runIndex++ {
-		FromSlice(inputSlice).Filter(func(value interface{}) (bool, error) {
-			intValue := value.(int)
-			return intValue%2 == 0, nil
-		}).Map(func(value interface{}) (interface{}, error) {
-			intValue := value.(int)
-			return intValue*2 + 2, nil
+		FromSlice(inputSlice).Filter(func(value int) (bool, error) {
+			return value%2 == 0, nil
+		}).Map(func(value int) (int, error) {
+			return value*2 + 2, nil
 		}).Slice()
 	}
 }

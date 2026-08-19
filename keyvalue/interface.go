@@ -2,7 +2,7 @@
 package keyvalue
 
 // KeyValuer is used to represent key and value pairs.
-type KeyValuer interface {
-	Key()   interface{}
-	Value() interface{}
+type KeyValuer[K, V any] interface {
+	Key() K
+	Value() V
 }
